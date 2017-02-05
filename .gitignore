@@ -5,4 +5,5 @@
 TestResults/
 packages/
 BuildArtifacts/
-tools/
+*/tools/*
+!*/tools/packages.config
