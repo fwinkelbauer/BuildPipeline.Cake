@@ -4,7 +4,7 @@
 
 ## What It Does
 
-`Pipeline.cake` performs a set of given sets:
+`Pipeline.cake` performs a set of given steps:
 
 - Clean
 - NuGet restore
