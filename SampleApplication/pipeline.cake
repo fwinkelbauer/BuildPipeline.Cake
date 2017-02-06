@@ -31,6 +31,9 @@ public static class PipelineSettings
         Platform = MSBuildPlatform.Automatic;
         Properties = new Dictionary<string, string[]>();
         TestDllWhitelist = "*Tests.dll";
+        OpenCoverFilter = "+[*]* -[*Tests]*";
+        OpenCoverExcludeByFile = "*/*Designer.cs;*/*.g.cs;*/*.g.i.cs";
+        DupFinderExcludePattern = new string[] {};
     }
 
     public static bool DoAnalyze { get; set; }
@@ -42,6 +45,9 @@ public static class PipelineSettings
     public static MSBuildPlatform Platform { get; set; }
     public static Dictionary<string, string[]> Properties { get; private set; }
     public static string TestDllWhitelist { get; set; }
+    public static string OpenCoverFilter { get; set; }
+    public static string OpenCoverExcludeByFile { get; set; }
+    public static string[] DupFinderExcludePattern { get; set; }
 }
 
 Task("Clean")
@@ -98,8 +104,8 @@ Task("Test")
         tool => { tool.VSTest("**/bin/" + PipelineSettings.Configuration + "/" + PipelineSettings.TestDllWhitelist, new VSTestSettings().WithVisualStudioLogger()); },
         openCoverXml,
         new OpenCoverSettings() { ReturnTargetCodeOffset = 0 }
-            .WithFilter("+[*]* -[*.Tests]*")
-            .ExcludeByFile("*/*Designer.cs;*/*.g.cs;*/*.g.i.cs"));
+            .WithFilter(PipelineSettings.OpenCoverFilter)
+            .ExcludeByFile(PipelineSettings.OpenCoverExcludeByFile));
 })
 .Finally(() =>
 {
@@ -118,7 +124,8 @@ Task("DupFinder")
         ShowStats = true,
         ShowText = true,
         OutputFile = dupFinderXml,
-        ThrowExceptionOnFindingDuplicates = true });
+        ThrowExceptionOnFindingDuplicates = true,
+        ExcludePattern = PipelineSettings.DupFinderExcludePattern });
 })
 .Finally(() =>
 {
