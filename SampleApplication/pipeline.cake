@@ -58,12 +58,6 @@ Task("Clean")
         .SetMSBuildPlatform(PipelineSettings.Platform)
         .UseToolVersion(PipelineSettings.ToolVersion)
         .WithTarget("Clean");
-
-    if (PipelineSettings.DoTreatWarningsAsErrors)
-    {
-        settings.WithProperty("TreatWarningsAsErrors", new string[] { "true" });
-    }
-
     CleanDirectories(new string[] { testResultsDir.FullPath, artifactsDir.FullPath });
     MSBuild(PipelineSettings.Solution, settings);
 });
