@@ -5,12 +5,15 @@
 #tool nuget:?package=ReSharperReports&version=0.4.0
 
 #addin nuget:?package=Cake.ReSharperReports&version=0.6.0
+#addin nuget:?package=Cake.VsMetrics&version=0.1.0
 
 var testResultsDir = new DirectoryPath("TestResults");
 var artifactsDir = new DirectoryPath("BuildArtifacts");
 var openCoverDir = new DirectoryPath(artifactsDir + "/OpenCover");
 var openCoverXml = new FilePath(openCoverDir + "/openCover.xml");
 var vsTestDir = new DirectoryPath(artifactsDir + "/VSTest");
+var vsMetricsDir = new DirectoryPath(artifactsDir + "/Metrics");
+var vsMetricsXml = new FilePath(vsMetricsDir + "/metrics.xml");
 var dupFinderDir = new DirectoryPath(artifactsDir + "/DupFinder");
 var dupFinderXml = new FilePath(dupFinderDir + "/dupFinder.xml");
 var dupFinderHtml = new FilePath(dupFinderDir + "/dupFinder.html");
@@ -108,8 +111,18 @@ Task("Test")
     ReportUnit(testResultsDir, vsTestDir, new ReportUnitSettings());
 });
 
-Task("DupFinder")
+Task("VsMetrics")
     .IsDependentOn("Test")
+    .Does(() =>
+{
+    EnsureDirectoryExists(vsMetricsDir);
+
+    var projects = GetFiles("**/bin/" + PipelineSettings.Configuration + "/*.exe");
+    VsMetrics(projects, vsMetricsXml);
+});
+
+Task("DupFinder")
+    .IsDependentOn("VsMetrics")
     .WithCriteria(PipelineSettings.DoAnalyze)
     .Does(() =>
 {
