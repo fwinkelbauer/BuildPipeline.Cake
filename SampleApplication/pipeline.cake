@@ -34,6 +34,7 @@ public static class PipelineSettings
         Platform = MSBuildPlatform.Automatic;
         Properties = new Dictionary<string, string[]>();
         TestDllWhitelist = "*Tests.dll";
+        VsMetricsFiles = new FilePath[] {};
         OpenCoverFilter = "+[*]* -[*Tests]*";
         OpenCoverExcludeByFile = "*/*Designer.cs;*/*.g.cs;*/*.g.i.cs";
         DupFinderExcludePattern = new string[] {};
@@ -48,6 +49,7 @@ public static class PipelineSettings
     public static MSBuildPlatform Platform { get; set; }
     public static Dictionary<string, string[]> Properties { get; private set; }
     public static string TestDllWhitelist { get; set; }
+    public static FilePath[] VsMetricsFiles { get; set; }
     public static string OpenCoverFilter { get; set; }
     public static string OpenCoverExcludeByFile { get; set; }
     public static string[] DupFinderExcludePattern { get; set; }
@@ -112,18 +114,19 @@ Task("Test")
 });
 
 Task("VsMetrics")
+    .WithCriteria(() => PipelineSettings.VsMetricsFiles != null && PipelineSettings.VsMetricsFiles.Length > 0)
+    .WithCriteria(() => PipelineSettings.DoAnalyze)
     .IsDependentOn("Test")
     .Does(() =>
 {
     EnsureDirectoryExists(vsMetricsDir);
 
-    var projects = GetFiles("**/bin/" + PipelineSettings.Configuration + "/*.exe");
-    VsMetrics(projects, vsMetricsXml);
+    VsMetrics(PipelineSettings.VsMetricsFiles, vsMetricsXml);
 });
 
 Task("DupFinder")
     .IsDependentOn("VsMetrics")
-    .WithCriteria(PipelineSettings.DoAnalyze)
+    .WithCriteria(() => PipelineSettings.DoAnalyze)
     .Does(() =>
 {
     EnsureDirectoryExists(dupFinderDir);
@@ -141,7 +144,7 @@ Task("DupFinder")
 
 Task("InspectCode")
     .IsDependentOn("DupFinder")
-    .WithCriteria(PipelineSettings.DoAnalyze)
+    .WithCriteria(() => PipelineSettings.DoAnalyze)
     .Does(() =>
 {
     EnsureDirectoryExists(inspectCodeDir);
