@@ -1,4 +1,3 @@
-// TODO Use a NuGet package instead when Cake 0.18.0 is released
 #load pipeline.cake
 
 var target = Argument("target", "Default");
@@ -14,7 +13,10 @@ Setup(context => {
 });
 
 Task("Default")
-    .IsDependentOn("BuildPipeline")
+    .IsDependentOn("Test")
+    .IsDependentOn("Metrics")
+    .IsDependentOn("InspectCode")
+    .IsDependentOn("DupFinder")
     .Does(() =>
 {
 });

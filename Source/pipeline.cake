@@ -8,7 +8,7 @@
 #addin nuget:?package=Cake.VsMetrics&version=0.1.0
 
 var testResultsDir = new DirectoryPath("TestResults");
-var artifactsDir = new DirectoryPath("BuildArtifacts");
+var artifactsDir = new DirectoryPath("../BuildArtifacts");
 var openCoverDir = new DirectoryPath(artifactsDir + "/OpenCover");
 var openCoverXml = new FilePath(openCoverDir + "/openCover.xml");
 var vsTestDir = new DirectoryPath(artifactsDir + "/VSTest");
@@ -25,23 +25,19 @@ public static class PipelineSettings
 {
     static PipelineSettings()
     {
-        DoAnalyze = true;
-        DoTest = true;
         DoTreatWarningsAsErrors = true;
         Solution = "";
         Configuration = "Release";
         ToolVersion = MSBuildToolVersion.Default;
         Platform = MSBuildPlatform.Automatic;
         Properties = new Dictionary<string, string[]>();
-        TestDllWhitelist = "*Tests.dll";
+        TestDllWhitelist = "*Tests*.dll";
         VsMetricsFiles = new FilePath[] {};
         OpenCoverFilter = "+[*]* -[*Tests]*";
         OpenCoverExcludeByFile = "*/*Designer.cs;*/*.g.cs;*/*.g.i.cs";
         DupFinderExcludePattern = new string[] {};
     }
 
-    public static bool DoAnalyze { get; set; }
-    public static bool DoTest { get; set; }
     public static bool DoTreatWarningsAsErrors { get; set; }
     public static string Solution { get; set; }
     public static string Configuration { get; set; }
@@ -63,6 +59,7 @@ Task("Clean")
         .SetMSBuildPlatform(PipelineSettings.Platform)
         .UseToolVersion(PipelineSettings.ToolVersion)
         .WithTarget("Clean");
+
     CleanDirectories(new string[] { testResultsDir.FullPath, artifactsDir.FullPath });
     MSBuild(PipelineSettings.Solution, settings);
 });
@@ -93,7 +90,6 @@ Task("Build")
 
 Task("Test")
     .IsDependentOn("Build")
-    .WithCriteria(PipelineSettings.DoTest)
     .Does(() =>
 {
     EnsureDirectoryExists(openCoverDir);
@@ -113,10 +109,9 @@ Task("Test")
     ReportUnit(testResultsDir, vsTestDir, new ReportUnitSettings());
 });
 
-Task("VsMetrics")
+Task("Metrics")
     .WithCriteria(() => PipelineSettings.VsMetricsFiles != null && PipelineSettings.VsMetricsFiles.Length > 0)
-    .WithCriteria(() => PipelineSettings.DoAnalyze)
-    .IsDependentOn("Test")
+    .IsDependentOn("Build")
     .Does(() =>
 {
     EnsureDirectoryExists(vsMetricsDir);
@@ -125,11 +120,10 @@ Task("VsMetrics")
 });
 
 Task("DupFinder")
-    .IsDependentOn("VsMetrics")
-    .WithCriteria(() => PipelineSettings.DoAnalyze)
     .Does(() =>
 {
     EnsureDirectoryExists(dupFinderDir);
+
     DupFinder(PipelineSettings.Solution, new DupFinderSettings {
         ShowStats = true,
         ShowText = true,
@@ -143,11 +137,10 @@ Task("DupFinder")
 });
 
 Task("InspectCode")
-    .IsDependentOn("DupFinder")
-    .WithCriteria(() => PipelineSettings.DoAnalyze)
     .Does(() =>
 {
     EnsureDirectoryExists(inspectCodeDir);
+
     InspectCode(PipelineSettings.Solution, new InspectCodeSettings {
         SolutionWideAnalysis = true,
         OutputFile = inspectCodeXml,
@@ -156,10 +149,4 @@ Task("InspectCode")
 .Finally(() =>
 {
     ReSharperReports(inspectCodeXml, inspectCodeHtml);
-});
-
-Task("BuildPipeline")
-    .IsDependentOn("InspectCode")
-    .Does(() =>
-{
 });
