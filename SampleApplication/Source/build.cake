@@ -4,7 +4,7 @@
 #tool nuget:?package=ReportUnit&version=1.2.1
 #tool nuget:?package=ReSharperReports&version=0.4.0
 
-#load pipeline.cake
+#load "../../Cake.BuildUtil/Content/build.cake"
 
 var target = Argument("target", "Default");
 

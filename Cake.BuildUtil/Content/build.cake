@@ -1,9 +1,9 @@
 #addin nuget:?package=Cake.ReSharperReports&version=0.6.0
 #addin nuget:?package=Cake.VsMetrics&version=0.1.0
 
-public static class BuildArtifactSettings
+public static class BuildArtifactParameters
 {
-    static BuildArtifactSettings()
+    static BuildArtifactParameters()
     {
         TestResultsDir = new DirectoryPath("TestResults");
         ArtifactsDir = new DirectoryPath("../BuildArtifacts");
@@ -36,9 +36,9 @@ public static class BuildArtifactSettings
     public static FilePath InspectCodeHtml { get; set; }
 }
 
-public static class PipelineSettings
+public static class BuildParameters
 {
-    static PipelineSettings()
+    static BuildParameters()
     {
         DoTreatWarningsAsErrors = true;
         Configuration = "Release";
@@ -66,13 +66,13 @@ Task("Info")
 {
     foreach (var path in GetFiles("*.sln"))
     {
-        BuildArtifactSettings.Solution = path;
+        BuildArtifactParameters.Solution = path;
     }
 
-    Information("Building solution: {0}", BuildArtifactSettings.Solution);
-    Information("Configuration: {0}", PipelineSettings.Configuration);
-    Information("MSBuild version: {0}", PipelineSettings.ToolVersion);
-    Information("Platform: {0}", PipelineSettings.Platform);
+    Information("Building solution: {0}", BuildArtifactParameters.Solution);
+    Information("Configuration: {0}", BuildParameters.Configuration);
+    Information("MSBuild version: {0}", BuildParameters.ToolVersion);
+    Information("Platform: {0}", BuildParameters.Platform);
 });
 
 Task("Clean")
@@ -80,20 +80,20 @@ Task("Clean")
     .Does(() =>
 {
     MSBuildSettings settings = new MSBuildSettings()
-        .SetConfiguration(PipelineSettings.Configuration)
-        .SetMSBuildPlatform(PipelineSettings.Platform)
-        .UseToolVersion(PipelineSettings.ToolVersion)
+        .SetConfiguration(BuildParameters.Configuration)
+        .SetMSBuildPlatform(BuildParameters.Platform)
+        .UseToolVersion(BuildParameters.ToolVersion)
         .WithTarget("Clean");
 
-    CleanDirectory(BuildArtifactSettings.ArtifactsDir);
-    MSBuild(BuildArtifactSettings.Solution, settings);
+    CleanDirectory(BuildArtifactParameters.ArtifactsDir);
+    MSBuild(BuildArtifactParameters.Solution, settings);
 });
 
 Task("Restore")
     .IsDependentOn("Clean")
     .Does(() =>
 {
-    NuGetRestore(BuildArtifactSettings.Solution);
+    NuGetRestore(BuildArtifactParameters.Solution);
 });
 
 Task("Build")
@@ -101,89 +101,89 @@ Task("Build")
     .Does(() =>
 {
     MSBuildSettings settings = new MSBuildSettings()
-        .SetConfiguration(PipelineSettings.Configuration)
-        .SetMSBuildPlatform(PipelineSettings.Platform)
-        .UseToolVersion(PipelineSettings.ToolVersion);
+        .SetConfiguration(BuildParameters.Configuration)
+        .SetMSBuildPlatform(BuildParameters.Platform)
+        .UseToolVersion(BuildParameters.ToolVersion);
 
-    if (PipelineSettings.DoTreatWarningsAsErrors)
+    if (BuildParameters.DoTreatWarningsAsErrors)
     {
         settings.WithProperty("TreatWarningsAsErrors", new string[] { "true" });
     }
 
-    MSBuild(BuildArtifactSettings.Solution, settings);
+    MSBuild(BuildArtifactParameters.Solution, settings);
 });
 
 Task("VSTest")
     .IsDependentOn("Build")
     .Does(() =>
 {
-    EnsureDirectoryExists(BuildArtifactSettings.OpenCoverDir);
-    EnsureDirectoryExists(BuildArtifactSettings.VsTestDir);
-    CleanDirectory(BuildArtifactSettings.TestResultsDir);
+    EnsureDirectoryExists(BuildArtifactParameters.OpenCoverDir);
+    EnsureDirectoryExists(BuildArtifactParameters.VsTestDir);
+    CleanDirectory(BuildArtifactParameters.TestResultsDir);
 
     OpenCover(
-        tool => { tool.VSTest("**/bin/" + PipelineSettings.Configuration + "/" + PipelineSettings.TestDllWhitelist, new VSTestSettings().WithVisualStudioLogger()); },
-        BuildArtifactSettings.OpenCoverXml,
+        tool => { tool.VSTest("**/bin/" + BuildParameters.Configuration + "/" + BuildParameters.TestDllWhitelist, new VSTestSettings().WithVisualStudioLogger()); },
+        BuildArtifactParameters.OpenCoverXml,
         new OpenCoverSettings() { ReturnTargetCodeOffset = 0 }
-            .WithFilter(PipelineSettings.OpenCoverFilter)
-            .ExcludeByFile(PipelineSettings.OpenCoverExcludeByFile));
+            .WithFilter(BuildParameters.OpenCoverFilter)
+            .ExcludeByFile(BuildParameters.OpenCoverExcludeByFile));
 })
 .Finally(() =>
 {
-    CopyFiles(BuildArtifactSettings.TestResultsDir + "/*", BuildArtifactSettings.VsTestDir);
-    ReportGenerator(BuildArtifactSettings.OpenCoverXml, BuildArtifactSettings.OpenCoverDir);
-    ReportUnit(BuildArtifactSettings.TestResultsDir, BuildArtifactSettings.VsTestDir, new ReportUnitSettings());
+    CopyFiles(BuildArtifactParameters.TestResultsDir + "/*", BuildArtifactParameters.VsTestDir);
+    ReportGenerator(BuildArtifactParameters.OpenCoverXml, BuildArtifactParameters.OpenCoverDir);
+    ReportUnit(BuildArtifactParameters.TestResultsDir, BuildArtifactParameters.VsTestDir, new ReportUnitSettings());
 });
 
 Task("VSMetrics")
     .IsDependentOn("Build")
     .Does(() =>
 {
-    EnsureDirectoryExists(BuildArtifactSettings.VsMetricsDir);
+    EnsureDirectoryExists(BuildArtifactParameters.VsMetricsDir);
 
-    var parsedSolution = ParseSolution(BuildArtifactSettings.Solution);
+    var parsedSolution = ParseSolution(BuildArtifactParameters.Solution);
     var projectOutputs = new FilePathCollection(new PathComparer(false));
 
     foreach (var project in parsedSolution.Projects)
     {
-        var partialPath = project.Name + "/bin/" + PipelineSettings.Configuration + "/" + project.Name;
+        var partialPath = project.Name + "/bin/" + BuildParameters.Configuration + "/" + project.Name;
         projectOutputs.Add(GetFiles(partialPath + ".exe"));
         projectOutputs.Add(GetFiles(partialPath + ".dll"));
     }
 
-    VsMetrics(projectOutputs, BuildArtifactSettings.VsMetricsXml);
+    VsMetrics(projectOutputs, BuildArtifactParameters.VsMetricsXml);
 });
 
 Task("DupFinder")
     .IsDependentOn("Info")
     .Does(() =>
 {
-    EnsureDirectoryExists(BuildArtifactSettings.DupFinderDir);
+    EnsureDirectoryExists(BuildArtifactParameters.DupFinderDir);
 
-    DupFinder(BuildArtifactSettings.Solution, new DupFinderSettings {
+    DupFinder(BuildArtifactParameters.Solution, new DupFinderSettings {
         ShowStats = true,
         ShowText = true,
-        OutputFile = BuildArtifactSettings.DupFinderXml,
+        OutputFile = BuildArtifactParameters.DupFinderXml,
         ThrowExceptionOnFindingDuplicates = true,
-        ExcludePattern = PipelineSettings.DupFinderExcludePattern });
+        ExcludePattern = BuildParameters.DupFinderExcludePattern });
 })
 .Finally(() =>
 {
-    ReSharperReports(BuildArtifactSettings.DupFinderXml, BuildArtifactSettings.DupFinderHtml);
+    ReSharperReports(BuildArtifactParameters.DupFinderXml, BuildArtifactParameters.DupFinderHtml);
 });
 
 Task("InspectCode")
     .IsDependentOn("Info")
     .Does(() =>
 {
-    EnsureDirectoryExists(BuildArtifactSettings.InspectCodeDir);
+    EnsureDirectoryExists(BuildArtifactParameters.InspectCodeDir);
 
-    InspectCode(BuildArtifactSettings.Solution, new InspectCodeSettings {
+    InspectCode(BuildArtifactParameters.Solution, new InspectCodeSettings {
         SolutionWideAnalysis = true,
-        OutputFile = BuildArtifactSettings.InspectCodeXml,
+        OutputFile = BuildArtifactParameters.InspectCodeXml,
         ThrowExceptionOnFindingViolations = true });
 })
 .Finally(() =>
 {
-    ReSharperReports(BuildArtifactSettings.InspectCodeXml, BuildArtifactSettings.InspectCodeHtml);
+    ReSharperReports(BuildArtifactParameters.InspectCodeXml, BuildArtifactParameters.InspectCodeHtml);
 });

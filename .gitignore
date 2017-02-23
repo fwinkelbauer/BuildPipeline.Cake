@@ -2,8 +2,8 @@
 *.user
 **/bin
 **/obj
-TestResults/
-packages/
-BuildArtifacts/
-*/tools/*
-!*/tools/packages.config
+**/TestResults/
+**/packages/
+**/BuildArtifacts/
+**/tools/*
+!**/tools/packages.config
