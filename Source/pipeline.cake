@@ -71,6 +71,11 @@ Task("Info")
     {
         EnvironmentSettings.Solution = path;
     }
+	
+	Information("Building solution: {0}", EnvironmentSettings.Solution);
+	Information("Configuration: {0}", PipelineSettings.Configuration);
+	Information("MSBuild version: {0}", PipelineSettings.ToolVersion);
+	Information("Platform: {0}", PipelineSettings.Platform);
 });
 
 Task("Clean")
