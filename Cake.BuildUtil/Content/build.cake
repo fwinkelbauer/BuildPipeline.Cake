@@ -54,7 +54,6 @@ public static class BuildParameters
     public static string Configuration { get; set; }
     public static MSBuildToolVersion ToolVersion { get; set; }
     public static MSBuildPlatform Platform { get; set; }
-    public static Dictionary<string, string[]> Properties { get; private set; }
     public static string TestDllWhitelist { get; set; }
     public static string OpenCoverFilter { get; set; }
     public static string OpenCoverExcludeByFile { get; set; }
