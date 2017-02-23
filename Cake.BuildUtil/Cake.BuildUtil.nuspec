@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Cake.BuildUtil</id>
+    <version>0.1.0</version>
+    <authors>fwinkelbauer</authors>
+    <owners>fwinkelbauer</owners>
+    <licenseUrl>https://github.com/fwinkelbauer/Cake.BuildUtil/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/fwinkelbauer/Cake.BuildUtil</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A custom Cake script to build C# projects.</description>
+    <copyright>Copyright 2017</copyright>
+    <tags>Build Cake</tags>
+  </metadata>
+</package>
