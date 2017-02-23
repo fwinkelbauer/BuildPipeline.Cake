@@ -1,26 +1,40 @@
 #addin nuget:?package=Cake.ReSharperReports&version=0.6.0
 #addin nuget:?package=Cake.VsMetrics&version=0.1.0
 
-FilePath solution;
-
-foreach (var path in GetFiles("*.sln"))
+public static class EnvironmentSettings
 {
-    solution = path;
-}
+    static EnvironmentSettings()
+    {
+        TestResultsDir = new DirectoryPath("TestResults");
+        ArtifactsDir = new DirectoryPath("../BuildArtifacts");
+        OpenCoverDir = new DirectoryPath(ArtifactsDir + "/OpenCover");
+        OpenCoverXml = new FilePath(OpenCoverDir + "/openCover.xml");
+        VsTestDir = new DirectoryPath(ArtifactsDir + "/VSTest");
+        VsMetricsDir = new DirectoryPath(ArtifactsDir + "/Metrics");
+        VsMetricsXml = new FilePath(VsMetricsDir + "/metrics.xml");
+        DupFinderDir = new DirectoryPath(ArtifactsDir + "/DupFinder");
+        DupFinderXml = new FilePath(DupFinderDir + "/dupFinder.xml");
+        DupFinderHtml = new FilePath(DupFinderDir + "/dupFinder.html");
+        InspectCodeDir = new DirectoryPath(ArtifactsDir + "/InspectCode");
+        InspectCodeXml = new FilePath(InspectCodeDir + "/inspectCode.xml");
+        InspectCodeHtml = new FilePath(InspectCodeDir + "/inspectCode.html");
+    }
 
-var testResultsDir = new DirectoryPath("TestResults");
-var artifactsDir = new DirectoryPath("../BuildArtifacts");
-var openCoverDir = new DirectoryPath(artifactsDir + "/OpenCover");
-var openCoverXml = new FilePath(openCoverDir + "/openCover.xml");
-var vsTestDir = new DirectoryPath(artifactsDir + "/VSTest");
-var vsMetricsDir = new DirectoryPath(artifactsDir + "/Metrics");
-var vsMetricsXml = new FilePath(vsMetricsDir + "/metrics.xml");
-var dupFinderDir = new DirectoryPath(artifactsDir + "/DupFinder");
-var dupFinderXml = new FilePath(dupFinderDir + "/dupFinder.xml");
-var dupFinderHtml = new FilePath(dupFinderDir + "/dupFinder.html");
-var inspectCodeDir = new DirectoryPath(artifactsDir + "/InspectCode");
-var inspectCodeXml = new FilePath(inspectCodeDir + "/inspectCode.xml");
-var inspectCodeHtml = new FilePath(inspectCodeDir + "/inspectCode.html");
+    public static FilePath Solution { get; set; }
+    public static DirectoryPath TestResultsDir { get; set; }
+    public static DirectoryPath ArtifactsDir { get; set; }
+    public static DirectoryPath OpenCoverDir { get; set; }
+    public static FilePath OpenCoverXml { get; set; }
+    public static DirectoryPath VsTestDir { get; set; }
+    public static DirectoryPath VsMetricsDir { get; set; }
+    public static FilePath VsMetricsXml { get; set; }
+    public static DirectoryPath DupFinderDir { get; set; }
+    public static FilePath DupFinderXml { get; set; }
+    public static FilePath DupFinderHtml { get; set; }
+    public static DirectoryPath InspectCodeDir { get; set; }
+    public static FilePath InspectCodeXml { get; set; }
+    public static FilePath InspectCodeHtml { get; set; }
+}
 
 public static class PipelineSettings
 {
@@ -50,7 +64,17 @@ public static class PipelineSettings
     public static string[] DupFinderExcludePattern { get; set; }
 }
 
+Task("Info")
+    .Does(() =>
+{
+    foreach (var path in GetFiles("*.sln"))
+    {
+        EnvironmentSettings.Solution = path;
+    }
+});
+
 Task("Clean")
+    .IsDependentOn("Info")
     .Does(() =>
 {
     MSBuildSettings settings = new MSBuildSettings()
@@ -59,15 +83,15 @@ Task("Clean")
         .UseToolVersion(PipelineSettings.ToolVersion)
         .WithTarget("Clean");
 
-    CleanDirectories(new string[] { testResultsDir.FullPath, artifactsDir.FullPath });
-    MSBuild(solution, settings);
+    CleanDirectories(new string[] { EnvironmentSettings.TestResultsDir.FullPath, EnvironmentSettings.ArtifactsDir.FullPath });
+    MSBuild(EnvironmentSettings.Solution, settings);
 });
 
 Task("Restore")
     .IsDependentOn("Clean")
     .Does(() =>
 {
-    NuGetRestore(solution);
+    NuGetRestore(EnvironmentSettings.Solution);
 });
 
 Task("Build")
@@ -84,28 +108,28 @@ Task("Build")
         settings.WithProperty("TreatWarningsAsErrors", new string[] { "true" });
     }
 
-    MSBuild(solution, settings);
+    MSBuild(EnvironmentSettings.Solution, settings);
 });
 
 Task("VSTest")
     .IsDependentOn("Build")
     .Does(() =>
 {
-    EnsureDirectoryExists(openCoverDir);
-    EnsureDirectoryExists(vsTestDir);
+    EnsureDirectoryExists(EnvironmentSettings.OpenCoverDir);
+    EnsureDirectoryExists(EnvironmentSettings.VsTestDir);
 
     OpenCover(
         tool => { tool.VSTest("**/bin/" + PipelineSettings.Configuration + "/" + PipelineSettings.TestDllWhitelist, new VSTestSettings().WithVisualStudioLogger()); },
-        openCoverXml,
+        EnvironmentSettings.OpenCoverXml,
         new OpenCoverSettings() { ReturnTargetCodeOffset = 0 }
             .WithFilter(PipelineSettings.OpenCoverFilter)
             .ExcludeByFile(PipelineSettings.OpenCoverExcludeByFile));
 })
 .Finally(() =>
 {
-    CopyFiles(testResultsDir + "/*", vsTestDir);
-    ReportGenerator(openCoverXml, openCoverDir);
-    ReportUnit(testResultsDir, vsTestDir, new ReportUnitSettings());
+    CopyFiles(EnvironmentSettings.TestResultsDir + "/*", EnvironmentSettings.VsTestDir);
+    ReportGenerator(EnvironmentSettings.OpenCoverXml, EnvironmentSettings.OpenCoverDir);
+    ReportUnit(EnvironmentSettings.TestResultsDir, EnvironmentSettings.VsTestDir, new ReportUnitSettings());
 });
 
 Task("VSMetrics")
@@ -113,39 +137,41 @@ Task("VSMetrics")
     .IsDependentOn("Build")
     .Does(() =>
 {
-    EnsureDirectoryExists(vsMetricsDir);
+    EnsureDirectoryExists(EnvironmentSettings.VsMetricsDir);
 
-    VsMetrics(PipelineSettings.VsMetricsFiles, vsMetricsXml);
+    VsMetrics(PipelineSettings.VsMetricsFiles, EnvironmentSettings.VsMetricsXml);
 });
 
 Task("DupFinder")
+    .IsDependentOn("Info")
     .Does(() =>
 {
-    EnsureDirectoryExists(dupFinderDir);
+    EnsureDirectoryExists(EnvironmentSettings.DupFinderDir);
 
-    DupFinder(solution, new DupFinderSettings {
+    DupFinder(EnvironmentSettings.Solution, new DupFinderSettings {
         ShowStats = true,
         ShowText = true,
-        OutputFile = dupFinderXml,
+        OutputFile = EnvironmentSettings.DupFinderXml,
         ThrowExceptionOnFindingDuplicates = true,
         ExcludePattern = PipelineSettings.DupFinderExcludePattern });
 })
 .Finally(() =>
 {
-    ReSharperReports(dupFinderXml, dupFinderHtml);
+    ReSharperReports(EnvironmentSettings.DupFinderXml, EnvironmentSettings.DupFinderHtml);
 });
 
 Task("InspectCode")
+    .IsDependentOn("Info")
     .Does(() =>
 {
-    EnsureDirectoryExists(inspectCodeDir);
+    EnsureDirectoryExists(EnvironmentSettings.InspectCodeDir);
 
-    InspectCode(solution, new InspectCodeSettings {
+    InspectCode(EnvironmentSettings.Solution, new InspectCodeSettings {
         SolutionWideAnalysis = true,
-        OutputFile = inspectCodeXml,
+        OutputFile = EnvironmentSettings.InspectCodeXml,
         ThrowExceptionOnFindingViolations = true });
 })
 .Finally(() =>
 {
-    ReSharperReports(inspectCodeXml, inspectCodeHtml);
+    ReSharperReports(EnvironmentSettings.InspectCodeXml, EnvironmentSettings.InspectCodeHtml);
 });
