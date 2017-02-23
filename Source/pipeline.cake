@@ -1,6 +1,13 @@
 #addin nuget:?package=Cake.ReSharperReports&version=0.6.0
 #addin nuget:?package=Cake.VsMetrics&version=0.1.0
 
+FilePath solution;
+
+foreach (var path in GetFiles("*.sln"))
+{
+    solution = path;
+}
+
 var testResultsDir = new DirectoryPath("TestResults");
 var artifactsDir = new DirectoryPath("../BuildArtifacts");
 var openCoverDir = new DirectoryPath(artifactsDir + "/OpenCover");
@@ -20,7 +27,6 @@ public static class PipelineSettings
     static PipelineSettings()
     {
         DoTreatWarningsAsErrors = true;
-        Solution = "";
         Configuration = "Release";
         ToolVersion = MSBuildToolVersion.Default;
         Platform = MSBuildPlatform.Automatic;
@@ -33,7 +39,6 @@ public static class PipelineSettings
     }
 
     public static bool DoTreatWarningsAsErrors { get; set; }
-    public static string Solution { get; set; }
     public static string Configuration { get; set; }
     public static MSBuildToolVersion ToolVersion { get; set; }
     public static MSBuildPlatform Platform { get; set; }
@@ -55,14 +60,14 @@ Task("Clean")
         .WithTarget("Clean");
 
     CleanDirectories(new string[] { testResultsDir.FullPath, artifactsDir.FullPath });
-    MSBuild(PipelineSettings.Solution, settings);
+    MSBuild(solution, settings);
 });
 
 Task("Restore")
     .IsDependentOn("Clean")
     .Does(() =>
 {
-    NuGetRestore(PipelineSettings.Solution);
+    NuGetRestore(solution);
 });
 
 Task("Build")
@@ -79,7 +84,7 @@ Task("Build")
         settings.WithProperty("TreatWarningsAsErrors", new string[] { "true" });
     }
 
-    MSBuild(PipelineSettings.Solution, settings);
+    MSBuild(solution, settings);
 });
 
 Task("VSTest")
@@ -118,7 +123,7 @@ Task("DupFinder")
 {
     EnsureDirectoryExists(dupFinderDir);
 
-    DupFinder(PipelineSettings.Solution, new DupFinderSettings {
+    DupFinder(solution, new DupFinderSettings {
         ShowStats = true,
         ShowText = true,
         OutputFile = dupFinderXml,
@@ -135,7 +140,7 @@ Task("InspectCode")
 {
     EnsureDirectoryExists(inspectCodeDir);
 
-    InspectCode(PipelineSettings.Solution, new InspectCodeSettings {
+    InspectCode(solution, new InspectCodeSettings {
         SolutionWideAnalysis = true,
         OutputFile = inspectCodeXml,
         ThrowExceptionOnFindingViolations = true });

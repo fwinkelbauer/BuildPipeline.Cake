@@ -8,7 +8,6 @@
 
 var target = Argument("target", "Default");
 
-PipelineSettings.Solution = "SampleApplication.sln";
 PipelineSettings.VsMetricsFiles = new FilePath[] {
     "SampleApplication/bin/" + PipelineSettings.Configuration + "/SampleApplication.exe",
     "SampleApplication.Tests/bin/" + PipelineSettings.Configuration + "/SampleApplication.Tests.dll"
