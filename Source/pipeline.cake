@@ -46,7 +46,6 @@ public static class PipelineSettings
         Platform = MSBuildPlatform.Automatic;
         Properties = new Dictionary<string, string[]>();
         TestDllWhitelist = "*Test*.dll";
-        VsMetricsFiles = new FilePath[] {};
         OpenCoverFilter = "+[*]* -[*Test*]*";
         OpenCoverExcludeByFile = "*/*Designer.cs;*/*.g.cs;*/*.g.i.cs";
         DupFinderExcludePattern = new string[] {};
@@ -58,7 +57,6 @@ public static class PipelineSettings
     public static MSBuildPlatform Platform { get; set; }
     public static Dictionary<string, string[]> Properties { get; private set; }
     public static string TestDllWhitelist { get; set; }
-    public static FilePath[] VsMetricsFiles { get; set; }
     public static string OpenCoverFilter { get; set; }
     public static string OpenCoverExcludeByFile { get; set; }
     public static string[] DupFinderExcludePattern { get; set; }
@@ -71,11 +69,11 @@ Task("Info")
     {
         EnvironmentSettings.Solution = path;
     }
-	
-	Information("Building solution: {0}", EnvironmentSettings.Solution);
-	Information("Configuration: {0}", PipelineSettings.Configuration);
-	Information("MSBuild version: {0}", PipelineSettings.ToolVersion);
-	Information("Platform: {0}", PipelineSettings.Platform);
+
+    Information("Building solution: {0}", EnvironmentSettings.Solution);
+    Information("Configuration: {0}", PipelineSettings.Configuration);
+    Information("MSBuild version: {0}", PipelineSettings.ToolVersion);
+    Information("Platform: {0}", PipelineSettings.Platform);
 });
 
 Task("Clean")
@@ -138,13 +136,22 @@ Task("VSTest")
 });
 
 Task("VSMetrics")
-    .WithCriteria(() => PipelineSettings.VsMetricsFiles != null && PipelineSettings.VsMetricsFiles.Length > 0)
     .IsDependentOn("Build")
     .Does(() =>
 {
     EnsureDirectoryExists(EnvironmentSettings.VsMetricsDir);
 
-    VsMetrics(PipelineSettings.VsMetricsFiles, EnvironmentSettings.VsMetricsXml);
+    var parsedSolution = ParseSolution(EnvironmentSettings.Solution);
+    var projectOutputs = new FilePathCollection(new PathComparer(false));
+
+    foreach (var project in parsedSolution.Projects)
+    {
+        var partialPath = project.Name + "/bin/" + PipelineSettings.Configuration + "/" + project.Name;
+        projectOutputs.Add(GetFiles(partialPath + ".exe"));
+        projectOutputs.Add(GetFiles(partialPath + ".dll"));
+    }
+
+    VsMetrics(projectOutputs, EnvironmentSettings.VsMetricsXml);
 });
 
 Task("DupFinder")
