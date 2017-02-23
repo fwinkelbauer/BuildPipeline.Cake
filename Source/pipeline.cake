@@ -45,7 +45,7 @@ public static class PipelineSettings
         ToolVersion = MSBuildToolVersion.Default;
         Platform = MSBuildPlatform.Automatic;
         Properties = new Dictionary<string, string[]>();
-        TestDllWhitelist = "*Test*.dll";
+        TestDllWhitelist = "*.Tests*.dll";
         OpenCoverFilter = "+[*]* -[*Test*]*";
         OpenCoverExcludeByFile = "*/*Designer.cs;*/*.g.cs;*/*.g.i.cs";
         DupFinderExcludePattern = new string[] {};
@@ -86,7 +86,7 @@ Task("Clean")
         .UseToolVersion(PipelineSettings.ToolVersion)
         .WithTarget("Clean");
 
-    CleanDirectories(new string[] { EnvironmentSettings.TestResultsDir.FullPath, EnvironmentSettings.ArtifactsDir.FullPath });
+    CleanDirectory(EnvironmentSettings.ArtifactsDir);
     MSBuild(EnvironmentSettings.Solution, settings);
 });
 
@@ -120,6 +120,7 @@ Task("VSTest")
 {
     EnsureDirectoryExists(EnvironmentSettings.OpenCoverDir);
     EnsureDirectoryExists(EnvironmentSettings.VsTestDir);
+    CleanDirectory(EnvironmentSettings.TestResultsDir);
 
     OpenCover(
         tool => { tool.VSTest("**/bin/" + PipelineSettings.Configuration + "/" + PipelineSettings.TestDllWhitelist, new VSTestSettings().WithVisualStudioLogger()); },
