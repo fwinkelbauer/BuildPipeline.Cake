@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="*" Name="SampleApplication.Setup" Language="1033" Version="1.0.0.0" Manufacturer="Somebody" UpgradeCode="83e088a9-4ee4-477f-add9-2f93861dffe4">
+    <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <Feature Id="ProductFeature">
+      <ComponentGroupRef Id="ProductComponents" />
+    </Feature>
+  </Product>
+
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="SampleApplication.Setup" />
+      </Directory>
+    </Directory>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <Component Id="ProductComponent" Guid="3e412e3d-0339-111f-8633-f54ffaab4912">
+        <File Source="$(var.SampleApplication.TargetDir)\SampleApplication.exe" KeyPath="yes" />
+        <File Source="$(var.SampleApplication.TargetDir)\SampleApplication.exe.config" KeyPath="no" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>
