@@ -48,6 +48,7 @@ public static class BuildParameters
         OpenCoverFilter = "+[*]* -[*Test*]*";
         OpenCoverExcludeByFile = "*/*Designer.cs;*/*.g.cs;*/*.g.i.cs";
         DupFinderExcludePattern = new string[] {};
+        ClickOnceProjects = new FilePath[] {};
     }
 
     public static bool DoTreatWarningsAsErrors { get; set; }
@@ -58,6 +59,7 @@ public static class BuildParameters
     public static string OpenCoverFilter { get; set; }
     public static string OpenCoverExcludeByFile { get; set; }
     public static string[] DupFinderExcludePattern { get; set; }
+    public static FilePath[] ClickOnceProjects { get; set; }
 }
 
 Task("Info")
@@ -119,6 +121,13 @@ Task("Build")
     foreach (var wix in GetFiles("**/*.wixproj"))
     {
         MSBuild(wix, settings);
+    }
+
+    MSBuildSettings clickOnceSettings = settings.WithTarget("Publish");
+
+    foreach (var clickOnce in BuildParameters.ClickOnceProjects)
+    {
+        MSBuild(clickOnce, clickOnceSettings);
     }
 });
 
