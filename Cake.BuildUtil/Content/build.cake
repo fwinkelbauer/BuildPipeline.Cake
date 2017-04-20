@@ -86,6 +86,11 @@ Task("Clean")
 
     CleanDirectory(BuildArtifactParameters.ArtifactsDir);
     MSBuild(BuildArtifactParameters.Solution, settings);
+
+    foreach (var wix in GetFiles("**/*.wixproj"))
+    {
+        MSBuild(wix, settings);
+    }
 });
 
 Task("Restore")
@@ -110,6 +115,11 @@ Task("Build")
     }
 
     MSBuild(BuildArtifactParameters.Solution, settings);
+
+    foreach (var wix in GetFiles("**/*.wixproj"))
+    {
+        MSBuild(wix, settings);
+    }
 });
 
 Task("VSTest")
