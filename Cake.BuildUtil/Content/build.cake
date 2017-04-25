@@ -36,6 +36,38 @@ public static class BuildArtifactParameters
     public static FilePath InspectCodeHtml { get; set; }
 }
 
+public class MSBuildProperty
+{
+    public MSBuildProperty(string name, params string[] values)
+    {
+        Name = name;
+        Values = values;
+    }
+
+    public string Name { get; private set; }
+    public string[] Values { get; private set; }
+}
+
+public static class FlavorParameters
+{
+    static FlavorParameters()
+    {
+        CustomProperties = new Dictionary<string, IList<MSBuildProperty>>();
+    }
+
+    public static IDictionary<string, IList<MSBuildProperty>> CustomProperties { get; private set; }
+
+    public static void Add(string flavor, MSBuildProperty property)
+    {
+        if (!CustomProperties.ContainsKey(flavor))
+        {
+            CustomProperties.Add(flavor, new List<MSBuildProperty>());
+        }
+
+        CustomProperties[flavor].Add(property);
+    }
+}
+
 public static class BuildParameters
 {
     static BuildParameters()
@@ -49,6 +81,7 @@ public static class BuildParameters
         OpenCoverExcludeByFile = "*/*Designer.cs;*/*.g.cs;*/*.g.i.cs";
         DupFinderExcludePattern = new string[] {};
         ClickOnceProjects = new FilePath[] {};
+        Flavor = "Production";
     }
 
     public static bool DoTreatWarningsAsErrors { get; set; }
@@ -60,6 +93,7 @@ public static class BuildParameters
     public static string OpenCoverExcludeByFile { get; set; }
     public static string[] DupFinderExcludePattern { get; set; }
     public static FilePath[] ClickOnceProjects { get; set; }
+    public static string Flavor { get; set; }
 }
 
 Task("Info")
@@ -114,6 +148,11 @@ Task("Build")
     if (BuildParameters.DoTreatWarningsAsErrors)
     {
         settings.WithProperty("TreatWarningsAsErrors", new string[] { "true" });
+    }
+
+    foreach (var property in FlavorParameters.CustomProperties[BuildParameters.Flavor])
+    {
+        settings.WithProperty(property.Name, property.Values);
     }
 
     MSBuild(BuildArtifactParameters.Solution, settings);
