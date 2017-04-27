@@ -11,6 +11,11 @@ Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "SampleApplication.Setup", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleClickOnce", "SampleClickOnce\SampleClickOnce.csproj", "{5F06871C-E605-4C0D-886A-E683359BD416}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{C5C01C10-E51A-4EB6-BDE4-A45F3AEBBE64}"
+	ProjectSection(SolutionItems) = preProject
+		build.cake = build.cake
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
