@@ -19,6 +19,7 @@ public static class BuildArtifactParameters
         InspectCodeXml = new FilePath(InspectCodeDir + "/inspectCode.xml");
         InspectCodeHtml = new FilePath(InspectCodeDir + "/inspectCode.html");
         ChocolateyDir = new DirectoryPath(ArtifactsDir + "/Chocolatey");
+        NuGetDir = new DirectoryPath(ArtifactsDir + "/NuGet");
     }
 
     public static FilePath Solution { get; set; }
@@ -36,6 +37,7 @@ public static class BuildArtifactParameters
     public static FilePath InspectCodeXml { get; set; }
     public static FilePath InspectCodeHtml { get; set; }
     public static DirectoryPath ChocolateyDir { get; set; }
+    public static DirectoryPath NuGetDir { get; set; }
 }
 
 public class MSBuildProperty
@@ -65,6 +67,7 @@ public static class BuildParameters
         ClickOnceProjects = new FilePath[] {};
         CustomProperties = new Dictionary<string, IList<MSBuildProperty>>();
         ChocolateySpecs = "../NuSpec/Chocolatey/";
+        NuGetSpecs = "../NuSpec/NuGet/";
     }
 
     public static bool DoTreatWarningsAsErrors { get; set; }
@@ -78,6 +81,7 @@ public static class BuildParameters
     public static FilePath[] ClickOnceProjects { get; set; }
     public static IDictionary<string, IList<MSBuildProperty>> CustomProperties { get; private set; }
     public static DirectoryPath ChocolateySpecs { get; set; }
+    public static DirectoryPath NuGetSpecs { get; set; }
 
     public static void AddProperty(string config, MSBuildProperty property)
     {
@@ -239,15 +243,21 @@ Task("InspectCode")
     ReSharperReports(BuildArtifactParameters.InspectCodeXml, BuildArtifactParameters.InspectCodeHtml);
 });
 
-Task("Create-Chocolatey-Packages")
+Task("Create-Packages")
     .IsDependentOn("VSTest")
     .WithCriteria(() => DirectoryExists(BuildParameters.ChocolateySpecs))
     .Does(() =>
 {
     EnsureDirectoryExists(BuildArtifactParameters.ChocolateyDir);
+    EnsureDirectoryExists(BuildArtifactParameters.NuGetDir);
 
     foreach (var nuspec in GetFiles(BuildParameters.ChocolateySpecs + "/*.nuspec"))
     {
         ChocolateyPack(nuspec, new ChocolateyPackSettings() { OutputDirectory = BuildArtifactParameters.ChocolateyDir });
+    }
+
+    foreach (var nuspec in GetFiles(BuildParameters.NuGetSpecs + "/*.nuspec"))
+    {
+        NuGetPack(nuspec, new NuGetPackSettings() { OutputDirectory = BuildArtifactParameters.NuGetDir });
     }
 });
