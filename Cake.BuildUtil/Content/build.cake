@@ -22,9 +22,9 @@ public static class BuildArtifactParameters
         PackagesDir = new DirectoryPath(ArtifactsDir + "/Packages");
         ChocolateyDir = new DirectoryPath(PackagesDir + "/Chocolatey");
         NuGetDir = new DirectoryPath(PackagesDir + "/NuGet");
+        OutputDir = new DirectoryPath(ArtifactsDir + "/Output");
     }
 
-    public static FilePath Solution { get; set; }
     public static DirectoryPath TestResultsDir { get; set; }
     public static DirectoryPath ArtifactsDir { get; set; }
     public static DirectoryPath AnalysisDir { get; set; }
@@ -42,6 +42,7 @@ public static class BuildArtifactParameters
     public static DirectoryPath PackagesDir { get; set; }
     public static DirectoryPath ChocolateyDir { get; set; }
     public static DirectoryPath NuGetDir { get; set; }
+    public static DirectoryPath OutputDir { get; set; }
 }
 
 public class MSBuildProperty
@@ -74,6 +75,7 @@ public static class BuildParameters
         NuGetSpecs = "../NuSpec/NuGet/";
     }
 
+    public static FilePath Solution { get; set; }
     public static bool DoTreatWarningsAsErrors { get; set; }
     public static string Configuration { get; set; }
     public static MSBuildToolVersion ToolVersion { get; set; }
@@ -103,10 +105,10 @@ Task("Info")
 {
     foreach (var path in GetFiles("*.sln"))
     {
-        BuildArtifactParameters.Solution = path;
+        BuildParameters.Solution = path;
     }
 
-    Information("Building solution: {0}", BuildArtifactParameters.Solution);
+    Information("Building solution: {0}", BuildParameters.Solution);
     Information("Configuration: {0}", BuildParameters.Configuration);
     Information("MSBuild version: {0}", BuildParameters.ToolVersion);
     Information("Platform: {0}", BuildParameters.Platform);
@@ -123,7 +125,7 @@ Task("Clean")
         .WithTarget("Clean");
 
     CleanDirectory(BuildArtifactParameters.ArtifactsDir);
-    MSBuild(BuildArtifactParameters.Solution, settings);
+    MSBuild(BuildParameters.Solution, settings);
 
     foreach (var wix in GetFiles("**/*.wixproj"))
     {
@@ -135,7 +137,7 @@ Task("Restore")
     .IsDependentOn("Clean")
     .Does(() =>
 {
-    NuGetRestore(BuildArtifactParameters.Solution);
+    NuGetRestore(BuildParameters.Solution);
 });
 
 Task("Build")
@@ -157,7 +159,7 @@ Task("Build")
         settings.WithProperty(property.Name, property.Values);
     }
 
-    MSBuild(BuildArtifactParameters.Solution, settings);
+    MSBuild(BuildParameters.Solution, settings);
 
     foreach (var wix in GetFiles("**/*.wixproj"))
     {
@@ -169,6 +171,15 @@ Task("Build")
     foreach (var clickOnce in BuildParameters.ClickOnceProjects)
     {
         MSBuild(clickOnce, clickOnceSettings);
+    }
+
+    foreach (var project in ParseSolution(BuildParameters.Solution).Projects)
+    {
+        var bin = project.Name + "/bin/" + BuildParameters.Configuration + "/**/*";
+        var outputDir = new DirectoryPath(BuildArtifactParameters.OutputDir + "/" + project.Name);
+
+        EnsureDirectoryExists(outputDir);
+        CopyFiles(bin, outputDir, true);
     }
 });
 
@@ -200,10 +211,9 @@ Task("VSMetrics")
 {
     EnsureDirectoryExists(BuildArtifactParameters.VsMetricsDir);
 
-    var parsedSolution = ParseSolution(BuildArtifactParameters.Solution);
     var projectOutputs = new FilePathCollection(new PathComparer(false));
 
-    foreach (var project in parsedSolution.Projects)
+    foreach (var project in ParseSolution(BuildParameters.Solution).Projects)
     {
         var partialPath = project.Name + "/bin/" + BuildParameters.Configuration + "/" + project.Name;
         projectOutputs.Add(GetFiles(partialPath + ".exe"));
@@ -219,7 +229,7 @@ Task("DupFinder")
 {
     EnsureDirectoryExists(BuildArtifactParameters.DupFinderDir);
 
-    DupFinder(BuildArtifactParameters.Solution, new DupFinderSettings {
+    DupFinder(BuildParameters.Solution, new DupFinderSettings {
         ShowStats = true,
         ShowText = true,
         OutputFile = BuildArtifactParameters.DupFinderXml,
@@ -237,7 +247,7 @@ Task("InspectCode")
 {
     EnsureDirectoryExists(BuildArtifactParameters.InspectCodeDir);
 
-    InspectCode(BuildArtifactParameters.Solution, new InspectCodeSettings {
+    InspectCode(BuildParameters.Solution, new InspectCodeSettings {
         SolutionWideAnalysis = true,
         OutputFile = BuildArtifactParameters.InspectCodeXml,
         ThrowExceptionOnFindingViolations = true });
