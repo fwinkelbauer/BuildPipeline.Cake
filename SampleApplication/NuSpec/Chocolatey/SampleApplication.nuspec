@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>SampleApplication</id>
+    <version>1.0.0.0</version>
+    <title>SampleApplication</title>
+    <authors>Jon Doe</authors>
+    <description>This is just an example</description>
+  </metadata>
+  <files>
+    <file src="hello.txt" target="tools"/>
+  </files>
+</package>

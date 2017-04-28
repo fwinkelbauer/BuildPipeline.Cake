@@ -18,6 +18,7 @@ public static class BuildArtifactParameters
         InspectCodeDir = new DirectoryPath(ArtifactsDir + "/InspectCode");
         InspectCodeXml = new FilePath(InspectCodeDir + "/inspectCode.xml");
         InspectCodeHtml = new FilePath(InspectCodeDir + "/inspectCode.html");
+        ChocolateyDir = new DirectoryPath(ArtifactsDir + "/Chocolatey");
     }
 
     public static FilePath Solution { get; set; }
@@ -34,6 +35,7 @@ public static class BuildArtifactParameters
     public static DirectoryPath InspectCodeDir { get; set; }
     public static FilePath InspectCodeXml { get; set; }
     public static FilePath InspectCodeHtml { get; set; }
+    public static DirectoryPath ChocolateyDir { get; set; }
 }
 
 public class MSBuildProperty
@@ -62,6 +64,7 @@ public static class BuildParameters
         DupFinderExcludePattern = new string[] {};
         ClickOnceProjects = new FilePath[] {};
         CustomProperties = new Dictionary<string, IList<MSBuildProperty>>();
+        ChocolateySpecs = "../NuSpec/Chocolatey/";
     }
 
     public static bool DoTreatWarningsAsErrors { get; set; }
@@ -74,6 +77,7 @@ public static class BuildParameters
     public static string[] DupFinderExcludePattern { get; set; }
     public static FilePath[] ClickOnceProjects { get; set; }
     public static IDictionary<string, IList<MSBuildProperty>> CustomProperties { get; private set; }
+    public static DirectoryPath ChocolateySpecs { get; set; }
 
     public static void AddProperty(string config, MSBuildProperty property)
     {
@@ -233,4 +237,17 @@ Task("InspectCode")
 .Finally(() =>
 {
     ReSharperReports(BuildArtifactParameters.InspectCodeXml, BuildArtifactParameters.InspectCodeHtml);
+});
+
+Task("Create-Chocolatey-Packages")
+    .IsDependentOn("VSTest")
+    .WithCriteria(() => DirectoryExists(BuildParameters.ChocolateySpecs))
+    .Does(() =>
+{
+    EnsureDirectoryExists(BuildArtifactParameters.ChocolateyDir);
+
+    foreach (var nuspec in GetFiles(BuildParameters.ChocolateySpecs + "/*.nuspec"))
+    {
+        ChocolateyPack(nuspec, new ChocolateyPackSettings() { OutputDirectory = BuildArtifactParameters.ChocolateyDir });
+    }
 });
