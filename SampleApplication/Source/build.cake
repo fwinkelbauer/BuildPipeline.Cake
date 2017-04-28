@@ -16,10 +16,7 @@ Setup(context => {
 });
 
 Task("Default")
-    .IsDependentOn("Create-Packages")
-    .IsDependentOn("VSMetrics")
-    .IsDependentOn("InspectCode")
-    .IsDependentOn("DupFinder")
+    .IsDependentOn("CreatePackages")
     .Does(() =>
 {
 });

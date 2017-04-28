@@ -7,24 +7,27 @@ public static class BuildArtifactParameters
     {
         TestResultsDir = new DirectoryPath("TestResults");
         ArtifactsDir = new DirectoryPath("../BuildArtifacts");
-        OpenCoverDir = new DirectoryPath(ArtifactsDir + "/OpenCover");
+        AnalysisDir = new DirectoryPath(ArtifactsDir + "/Analysis");
+        OpenCoverDir = new DirectoryPath(AnalysisDir + "/OpenCover");
         OpenCoverXml = new FilePath(OpenCoverDir + "/openCover.xml");
-        VsTestDir = new DirectoryPath(ArtifactsDir + "/VSTest");
-        VsMetricsDir = new DirectoryPath(ArtifactsDir + "/Metrics");
+        VsTestDir = new DirectoryPath(AnalysisDir + "/VSTest");
+        VsMetricsDir = new DirectoryPath(AnalysisDir + "/Metrics");
         VsMetricsXml = new FilePath(VsMetricsDir + "/metrics.xml");
-        DupFinderDir = new DirectoryPath(ArtifactsDir + "/DupFinder");
+        DupFinderDir = new DirectoryPath(AnalysisDir + "/DupFinder");
         DupFinderXml = new FilePath(DupFinderDir + "/dupFinder.xml");
         DupFinderHtml = new FilePath(DupFinderDir + "/dupFinder.html");
-        InspectCodeDir = new DirectoryPath(ArtifactsDir + "/InspectCode");
+        InspectCodeDir = new DirectoryPath(AnalysisDir + "/InspectCode");
         InspectCodeXml = new FilePath(InspectCodeDir + "/inspectCode.xml");
         InspectCodeHtml = new FilePath(InspectCodeDir + "/inspectCode.html");
-        ChocolateyDir = new DirectoryPath(ArtifactsDir + "/Chocolatey");
-        NuGetDir = new DirectoryPath(ArtifactsDir + "/NuGet");
+        PackagesDir = new DirectoryPath(ArtifactsDir + "/Packages");
+        ChocolateyDir = new DirectoryPath(PackagesDir + "/Chocolatey");
+        NuGetDir = new DirectoryPath(PackagesDir + "/NuGet");
     }
 
     public static FilePath Solution { get; set; }
     public static DirectoryPath TestResultsDir { get; set; }
     public static DirectoryPath ArtifactsDir { get; set; }
+    public static DirectoryPath AnalysisDir { get; set; }
     public static DirectoryPath OpenCoverDir { get; set; }
     public static FilePath OpenCoverXml { get; set; }
     public static DirectoryPath VsTestDir { get; set; }
@@ -36,6 +39,7 @@ public static class BuildArtifactParameters
     public static DirectoryPath InspectCodeDir { get; set; }
     public static FilePath InspectCodeXml { get; set; }
     public static FilePath InspectCodeHtml { get; set; }
+    public static DirectoryPath PackagesDir { get; set; }
     public static DirectoryPath ChocolateyDir { get; set; }
     public static DirectoryPath NuGetDir { get; set; }
 }
@@ -243,8 +247,11 @@ Task("InspectCode")
     ReSharperReports(BuildArtifactParameters.InspectCodeXml, BuildArtifactParameters.InspectCodeHtml);
 });
 
-Task("Create-Packages")
+Task("CreatePackages")
     .IsDependentOn("VSTest")
+    .IsDependentOn("VSMetrics")
+    .IsDependentOn("DupFinder")
+    .IsDependentOn("InspectCode")
     .WithCriteria(() => DirectoryExists(BuildParameters.ChocolateySpecs))
     .Does(() =>
 {
