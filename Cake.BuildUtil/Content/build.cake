@@ -257,11 +257,17 @@ Task("InspectCode")
     ReSharperReports(BuildArtifactParameters.InspectCodeXml, BuildArtifactParameters.InspectCodeHtml);
 });
 
-Task("CreatePackages")
+Task("Analyze")
     .IsDependentOn("VSTest")
     .IsDependentOn("VSMetrics")
     .IsDependentOn("DupFinder")
     .IsDependentOn("InspectCode")
+    .Does(() =>
+{
+});
+
+Task("CreatePackages")
+    .IsDependentOn("Analyze")
     .WithCriteria(() => DirectoryExists(BuildParameters.ChocolateySpecs))
     .Does(() =>
 {
