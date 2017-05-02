@@ -124,7 +124,9 @@ Task("Clean")
         .UseToolVersion(BuildParameters.ToolVersion)
         .WithTarget("Clean");
 
+    CleanDirectory(BuildArtifactParameters.TestResultsDir);
     CleanDirectory(BuildArtifactParameters.ArtifactsDir);
+
     MSBuild(BuildParameters.Solution, settings);
 
     foreach (var wix in GetFiles("**/*.wixproj"))
@@ -189,7 +191,6 @@ Task("VSTest")
 {
     EnsureDirectoryExists(BuildArtifactParameters.OpenCoverDir);
     EnsureDirectoryExists(BuildArtifactParameters.VsTestDir);
-    CleanDirectory(BuildArtifactParameters.TestResultsDir);
 
     OpenCover(
         tool => { tool.VSTest("**/bin/" + BuildParameters.Configuration + "/" + BuildParameters.TestDllWhitelist, new VSTestSettings().WithVisualStudioLogger()); },
