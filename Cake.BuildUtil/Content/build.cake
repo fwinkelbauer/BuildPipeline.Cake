@@ -168,11 +168,11 @@ Task("Build")
         MSBuild(wix, settings);
     }
 
-    MSBuildSettings clickOnceSettings = settings.WithTarget("Publish");
+    settings.WithTarget("Publish");
 
     foreach (var clickOnce in BuildParameters.ClickOnceProjects)
     {
-        MSBuild(clickOnce, clickOnceSettings);
+        MSBuild(clickOnce, settings);
     }
 
     foreach (var project in ParseSolution(BuildParameters.Solution).Projects)
