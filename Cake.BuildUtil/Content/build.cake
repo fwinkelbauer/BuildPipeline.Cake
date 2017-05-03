@@ -128,11 +128,6 @@ Task("Clean")
     CleanDirectory(BuildArtifactParameters.ArtifactsDir);
 
     MSBuild(BuildParameters.Solution, settings);
-
-    foreach (var wix in GetFiles("**/*.wixproj"))
-    {
-        MSBuild(wix, settings);
-    }
 });
 
 Task("Restore")
@@ -162,11 +157,6 @@ Task("Build")
     }
 
     MSBuild(BuildParameters.Solution, settings);
-
-    foreach (var wix in GetFiles("**/*.wixproj"))
-    {
-        MSBuild(wix, settings);
-    }
 
     settings.WithTarget("Publish");
 
