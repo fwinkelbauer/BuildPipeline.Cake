@@ -11,10 +11,6 @@ var target = Argument("target", "Default");
 BuildParameters.ClickOnceProjects = new FilePath[] { "SampleClickOnce/SampleClickOnce.csproj" };
 BuildParameters.AddProperty("Release", new MSBuildProperty("ApplicationRevision", "6"));
 
-Setup(context => {
-    context.Tools.RegisterFile("C:/Program Files (x86)/Microsoft Visual Studio 14.0/Team Tools/Static Analysis Tools/FxCop/metrics.exe");
-});
-
 Task("Default")
     .IsDependentOn("CreatePackages")
     .Does(() =>

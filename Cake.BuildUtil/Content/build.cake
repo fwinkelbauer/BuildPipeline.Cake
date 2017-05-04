@@ -1,5 +1,5 @@
 #addin nuget:?package=Cake.ReSharperReports&version=0.6.0
-#addin nuget:?package=Cake.VsMetrics&version=0.1.0
+#addin nuget:?package=Cake.VsMetrics&version=0.2.0
 
 public static class BuildArtifactParameters
 {
