@@ -1,5 +1,6 @@
 #addin nuget:?package=Cake.ReSharperReports&version=0.6.0
 #addin nuget:?package=Cake.VsMetrics&version=0.2.0
+#addin nuget:?package=Cake.FileHelpers&version=1.0.4
 
 public static class BuildArtifactParameters
 {
@@ -61,6 +62,7 @@ public static class BuildParameters
 {
     static BuildParameters()
     {
+        Version = null;
         DoTreatWarningsAsErrors = true;
         Configuration = "Release";
         ToolVersion = MSBuildToolVersion.Default;
@@ -76,6 +78,7 @@ public static class BuildParameters
     }
 
     public static FilePath Solution { get; set; }
+    public static string Version { get; set; }
     public static bool DoTreatWarningsAsErrors { get; set; }
     public static string Configuration { get; set; }
     public static MSBuildToolVersion ToolVersion { get; set; }
@@ -109,6 +112,7 @@ Task("Info")
     }
 
     Information("Building solution: {0}", BuildParameters.Solution);
+    Information("Version: {0}", BuildParameters.Version);
     Information("Configuration: {0}", BuildParameters.Configuration);
     Information("MSBuild version: {0}", BuildParameters.ToolVersion);
     Information("Platform: {0}", BuildParameters.Platform);
@@ -137,8 +141,28 @@ Task("Restore")
     NuGetRestore(BuildParameters.Solution);
 });
 
+Task("InjectVersion")
+    .IsDependentOn("Restore")
+    .Does(() =>
+{
+    if (string.IsNullOrWhiteSpace(BuildParameters.Version))
+    {
+        throw new Exception("BuildParameters.Version cannot be null!");
+    }
+
+    var versionRegex = @"\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+";
+
+    var assemblyInfoFiles = BuildParameters.Solution.GetDirectory() + "/**/AssemblyInfo.cs";
+    var chocoFiles = BuildParameters.ChocolateySpecs + "/*.nuspec";
+    var nugetFiles = BuildParameters.NuGetSpecs + "/*.nuspec";
+
+    ReplaceRegexInFiles(assemblyInfoFiles, versionRegex, BuildParameters.Version);
+    ReplaceRegexInFiles(chocoFiles, versionRegex, BuildParameters.Version);
+    ReplaceRegexInFiles(nugetFiles, versionRegex, BuildParameters.Version);
+});
+
 Task("Build")
-    .IsDependentOn("Restore") 
+    .IsDependentOn("InjectVersion")
     .Does(() =>
 {
     MSBuildSettings settings = new MSBuildSettings()
