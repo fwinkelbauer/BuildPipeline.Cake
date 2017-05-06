@@ -78,7 +78,6 @@ public static class BuildParameters
         OpenCoverFilter = "+[*]* -[*Test*]*";
         OpenCoverExcludeByFile = "*/*Designer.cs;*/*.g.cs;*/*.g.i.cs";
         DupFinderExcludePattern = new string[] {};
-        ClickOnceProjects = new FilePath[] {};
         MSBuildProperties = new Dictionary<string, string[]>();
         ChocolateySpecs = "../NuSpec/Chocolatey/";
         NuGetSpecs = "../NuSpec/NuGet/";
@@ -95,7 +94,6 @@ public static class BuildParameters
     public static string OpenCoverFilter { get; set; }
     public static string OpenCoverExcludeByFile { get; set; }
     public static string[] DupFinderExcludePattern { get; set; }
-    public static FilePath[] ClickOnceProjects { get; set; }
     public static IDictionary<string, string[]> MSBuildProperties { get; private set; }
     public static DirectoryPath ChocolateySpecs { get; set; }
     public static DirectoryPath NuGetSpecs { get; set; }
@@ -187,13 +185,6 @@ Task("Build")
     }
 
     MSBuild(BuildParameters.Solution, settings);
-
-    settings.WithTarget("Publish");
-
-    foreach (var clickOnce in BuildParameters.ClickOnceProjects)
-    {
-        MSBuild(clickOnce, settings);
-    }
 
     // A solution folder is a simple folder which can be used to organize projects in a solution
     var solutionFolderType = "{2150E333-8FDC-42A3-9474-1A3956D46DE8}";

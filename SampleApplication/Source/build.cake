@@ -3,13 +3,24 @@
 var target = Argument("target", "Default");
 
 BuildParameters.Version = "1.0.0.1";
-BuildParameters.ClickOnceProjects = new FilePath[] { "SampleClickOnce/SampleClickOnce.csproj" };
-BuildParameters.AddMSBuildProperty("ApplicationVersion", BuildParameters.Version);
+BuildParameters.AddMSBuildProperty("MyCustomProperty", "value1", "value2");
 
 Task("Default")
     .IsDependentOn("CreatePackages")
+    .IsDependentOn("CreateClickOnce")
     .Does(() =>
 {
+});
+
+Task("CreateClickOnce")
+    .Does(() =>
+{
+    MSBuildSettings settings = new MSBuildSettings()
+        .SetConfiguration(BuildParameters.Configuration)
+        .WithTarget("publish")
+        .WithProperty("ApplicationVersion", BuildParameters.Version);
+
+    MSBuild("SampleClickOnce/SampleClickOnce.csproj", settings);
 });
 
 RunTarget(target);
