@@ -1,6 +1,6 @@
-#tool nuget:?package=JetBrains.ReSharper.CommandLineTools&version=2016.3.20161223.160402
+#tool nuget:?package=JetBrains.ReSharper.CommandLineTools&version=2017.1.20170428.83814
 #tool nuget:?package=OpenCover&version=4.6.519
-#tool nuget:?package=ReportGenerator&version=2.4.5
+#tool nuget:?package=ReportGenerator&version=2.5.7
 #tool nuget:?package=ReportUnit&version=1.2.1
 #tool nuget:?package=ReSharperReports&version=0.4.0
 
@@ -68,7 +68,6 @@ public static class BuildParameters
 {
     static BuildParameters()
     {
-        SolutionDir = ".";
         Version = null;
         DoTreatWarningsAsErrors = true;
         Configuration = "Release";
@@ -83,7 +82,6 @@ public static class BuildParameters
         NuGetSpecs = "../NuSpec/NuGet/";
     }
 
-    public static DirectoryPath SolutionDir { get; set; }
     public static FilePath Solution { get; set; }
     public static string Version { get; set; }
     public static bool DoTreatWarningsAsErrors { get; set; }
@@ -113,12 +111,11 @@ private bool IsSolutionFolder(SolutionProject project)
 Task("Info")
     .Does(() =>
 {
-    foreach (var path in GetFiles(BuildParameters.SolutionDir + "/*.sln"))
+    foreach (var path in GetFiles("*.sln"))
     {
         BuildParameters.Solution = path;
     }
 
-    Information("Source directory: {0}", MakeAbsolute(BuildParameters.SolutionDir));
     Information("Solution: {0}", BuildParameters.Solution);
     Information("Version: {0}", BuildParameters.Version);
     Information("Configuration: {0}", BuildParameters.Configuration);
@@ -158,7 +155,7 @@ Task("InjectVersion")
 
     var versionRegex = @"\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+";
 
-    var assemblyInfoFiles = BuildParameters.SolutionDir + "/**/AssemblyInfo.cs";
+    var assemblyInfoFiles = "./**/AssemblyInfo.cs";
     var chocoFiles = BuildParameters.ChocolateySpecs + "/*.nuspec";
     var nugetFiles = BuildParameters.NuGetSpecs + "/*.nuspec";
 
