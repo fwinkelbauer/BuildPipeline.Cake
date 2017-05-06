@@ -104,6 +104,12 @@ public static class BuildParameters
     }
 }
 
+// A solution folder is a simple folder which can be used to organize projects in a solution
+private bool IsSolutionFolder(SolutionProject project)
+{
+    return project.Type.Equals("{2150E333-8FDC-42A3-9474-1A3956D46DE8}");
+}
+
 Task("Info")
     .Does(() =>
 {
@@ -186,13 +192,9 @@ Task("Build")
 
     MSBuild(BuildParameters.Solution, settings);
 
-    // A solution folder is a simple folder which can be used to organize projects in a solution
-    var solutionFolderType = "{2150E333-8FDC-42A3-9474-1A3956D46DE8}";
-
     foreach (var project in ParseSolution(BuildParameters.Solution).Projects)
     {
-        // We want to skip solution folders as they contain no content on their own
-        if (project.Type.Equals(solutionFolderType))
+        if (IsSolutionFolder(project))
         {
             continue;
         }
@@ -239,9 +241,22 @@ Task("VSMetrics")
 
     foreach (var project in ParseSolution(BuildParameters.Solution).Projects)
     {
-        var partialPath = project.Name + "/bin/" + BuildParameters.Configuration + "/" + project.Name;
-        projectOutputs.Add(GetFiles(partialPath + ".exe"));
-        projectOutputs.Add(GetFiles(partialPath + ".dll"));
+        if (IsSolutionFolder(project))
+        {
+            continue;
+        }
+
+        if (project.Path.FullPath.ToLower().Contains("wixproj"))
+        {
+            Warning("Skipping WiX project");
+            continue;
+        }
+
+        var parseResult = ParseProject(project.Path);
+        var partialOutputPath = project.Path.GetDirectory().Combine(parseResult.OutputPath).FullPath + "/" + parseResult.AssemblyName;
+
+        projectOutputs.Add(GetFiles(partialOutputPath + ".exe"));
+        projectOutputs.Add(GetFiles(partialOutputPath + ".dll"));
     }
 
     VsMetrics(projectOutputs, BuildArtifactParameters.VsMetricsXml);
