@@ -68,6 +68,7 @@ public static class BuildParameters
 {
     static BuildParameters()
     {
+        SolutionDir = ".";
         Version = null;
         DoTreatWarningsAsErrors = true;
         Configuration = "Release";
@@ -83,6 +84,7 @@ public static class BuildParameters
         NuGetSpecs = "../NuSpec/NuGet/";
     }
 
+    public static DirectoryPath SolutionDir { get; set; }
     public static FilePath Solution { get; set; }
     public static string Version { get; set; }
     public static bool DoTreatWarningsAsErrors { get; set; }
@@ -112,16 +114,14 @@ public static class BuildParameters
 Task("Info")
     .Does(() =>
 {
-    foreach (var path in GetFiles("*.sln"))
+    foreach (var path in GetFiles(BuildParameters.SolutionDir + "/*.sln"))
     {
         BuildParameters.Solution = path;
     }
 
-    Information("Building solution: {0}", BuildParameters.Solution);
+    Information("Solution: {0}", BuildParameters.Solution);
     Information("Version: {0}", BuildParameters.Version);
     Information("Configuration: {0}", BuildParameters.Configuration);
-    Information("MSBuild version: {0}", BuildParameters.ToolVersion);
-    Information("Platform: {0}", BuildParameters.Platform);
 });
 
 Task("Clean")
@@ -148,7 +148,7 @@ Task("Restore")
 });
 
 Task("InjectVersion")
-    .IsDependentOn("Restore")
+    .IsDependentOn("Info")
     .Does(() =>
 {
     if (string.IsNullOrWhiteSpace(BuildParameters.Version))
@@ -158,7 +158,7 @@ Task("InjectVersion")
 
     var versionRegex = @"\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+";
 
-    var assemblyInfoFiles = BuildParameters.Solution.GetDirectory() + "/**/AssemblyInfo.cs";
+    var assemblyInfoFiles = BuildParameters.SolutionDir + "/**/AssemblyInfo.cs";
     var chocoFiles = BuildParameters.ChocolateySpecs + "/*.nuspec";
     var nugetFiles = BuildParameters.NuGetSpecs + "/*.nuspec";
 
@@ -168,9 +168,13 @@ Task("InjectVersion")
 });
 
 Task("Build")
+    .IsDependentOn("Restore")
     .IsDependentOn("InjectVersion")
     .Does(() =>
 {
+    Information("MSBuild version: {0}", BuildParameters.ToolVersion);
+    Information("Platform: {0}", BuildParameters.Platform);
+
     MSBuildSettings settings = new MSBuildSettings()
         .SetConfiguration(BuildParameters.Configuration)
         .SetMSBuildPlatform(BuildParameters.Platform)
