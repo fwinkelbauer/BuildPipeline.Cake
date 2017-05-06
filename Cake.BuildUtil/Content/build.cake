@@ -197,11 +197,14 @@ Task("Build")
             continue;
         }
 
-        var bin = project.Name + "/bin/" + BuildParameters.Configuration + "/**/*";
-        var outputDir = new DirectoryPath(BuildArtifactParameters.OutputDir + "/" + project.Name);
+        var parsedProject = ParseProject(project.Path);
+        var outputPath = project.Path.GetDirectory().Combine(parsedProject.OutputPath).FullPath + "/**/*";
+        // The output path of WiX projects might contain some variable names which we have to correct using actual values:
+        outputPath = outputPath.Replace("$(Platform)", parsedProject.Platform).Replace("$(Configuration)", parsedProject.Configuration);
+        var artifactsDir = new DirectoryPath(BuildArtifactParameters.OutputDir + "/" + project.Name);
 
-        EnsureDirectoryExists(outputDir);
-        CopyFiles(bin, outputDir, true);
+        EnsureDirectoryExists(artifactsDir);
+        CopyFiles(outputPath, artifactsDir, true);
     }
 });
 
