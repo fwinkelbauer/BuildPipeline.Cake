@@ -79,7 +79,7 @@ public static class BuildParameters
         OpenCoverExcludeByFile = "*/*Designer.cs;*/*.g.cs;*/*.g.i.cs";
         DupFinderExcludePattern = new string[] {};
         ClickOnceProjects = new FilePath[] {};
-        CustomProperties = new Dictionary<string, IList<MSBuildProperty>>();
+        MSBuildProperties = new Dictionary<string, string[]>();
         ChocolateySpecs = "../NuSpec/Chocolatey/";
         NuGetSpecs = "../NuSpec/NuGet/";
     }
@@ -96,18 +96,13 @@ public static class BuildParameters
     public static string OpenCoverExcludeByFile { get; set; }
     public static string[] DupFinderExcludePattern { get; set; }
     public static FilePath[] ClickOnceProjects { get; set; }
-    public static IDictionary<string, IList<MSBuildProperty>> CustomProperties { get; private set; }
+    public static IDictionary<string, string[]> MSBuildProperties { get; private set; }
     public static DirectoryPath ChocolateySpecs { get; set; }
     public static DirectoryPath NuGetSpecs { get; set; }
 
-    public static void AddProperty(string config, MSBuildProperty property)
+    public static void AddMSBuildProperty(string name, params string[] values)
     {
-        if (!CustomProperties.ContainsKey(config))
-        {
-            CustomProperties.Add(config, new List<MSBuildProperty>());
-        }
-
-        CustomProperties[config].Add(property);
+        MSBuildProperties.Add(name, values);
     }
 }
 
@@ -186,9 +181,9 @@ Task("Build")
         settings.WithProperty("TreatWarningsAsErrors", "true");
     }
 
-    foreach (var property in BuildParameters.CustomProperties[BuildParameters.Configuration])
+    foreach (KeyValuePair<string, string[]> entry in BuildParameters.MSBuildProperties)
     {
-        settings.WithProperty(property.Name, property.Values);
+        settings.WithProperty(entry.Key, entry.Value);
     }
 
     MSBuild(BuildParameters.Solution, settings);
