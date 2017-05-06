@@ -119,6 +119,7 @@ Task("Info")
         BuildParameters.Solution = path;
     }
 
+    Information("Source directory: {0}", MakeAbsolute(BuildParameters.SolutionDir));
     Information("Solution: {0}", BuildParameters.Solution);
     Information("Version: {0}", BuildParameters.Version);
     Information("Configuration: {0}", BuildParameters.Configuration);
@@ -199,8 +200,17 @@ Task("Build")
         MSBuild(clickOnce, settings);
     }
 
+    // A solution folder is a simple folder which can be used to organize projects in a solution
+    var solutionFolderType = "{2150E333-8FDC-42A3-9474-1A3956D46DE8}";
+
     foreach (var project in ParseSolution(BuildParameters.Solution).Projects)
     {
+        // We want to skip solution folders as they contain no content on their own
+        if (project.Type.Equals(solutionFolderType))
+        {
+            continue;
+        }
+
         var bin = project.Name + "/bin/" + BuildParameters.Configuration + "/**/*";
         var outputDir = new DirectoryPath(BuildArtifactParameters.OutputDir + "/" + project.Name);
 
