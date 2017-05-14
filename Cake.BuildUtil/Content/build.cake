@@ -10,30 +10,7 @@
 
 public static class BuildArtifactParameters
 {
-    static BuildArtifactParameters()
-    {
-        TestResultsDir = new DirectoryPath("TestResults");
-        ArtifactsDir = new DirectoryPath("../BuildArtifacts");
-        AnalysisDir = new DirectoryPath(ArtifactsDir + "/Analysis");
-        OpenCoverDir = new DirectoryPath(AnalysisDir + "/OpenCover");
-        OpenCoverXml = new FilePath(OpenCoverDir + "/openCover.xml");
-        VsTestDir = new DirectoryPath(AnalysisDir + "/VSTest");
-        VsMetricsDir = new DirectoryPath(AnalysisDir + "/Metrics");
-        VsMetricsXml = new FilePath(VsMetricsDir + "/metrics.xml");
-        DupFinderDir = new DirectoryPath(AnalysisDir + "/DupFinder");
-        DupFinderXml = new FilePath(DupFinderDir + "/dupFinder.xml");
-        DupFinderHtml = new FilePath(DupFinderDir + "/dupFinder.html");
-        InspectCodeDir = new DirectoryPath(AnalysisDir + "/InspectCode");
-        InspectCodeXml = new FilePath(InspectCodeDir + "/inspectCode.xml");
-        InspectCodeHtml = new FilePath(InspectCodeDir + "/inspectCode.html");
-        PackagesDir = new DirectoryPath(ArtifactsDir + "/Packages");
-        ChocolateyDir = new DirectoryPath(PackagesDir + "/Chocolatey");
-        NuGetDir = new DirectoryPath(PackagesDir + "/NuGet");
-        OutputDir = new DirectoryPath(ArtifactsDir + "/Output");
-    }
-
-    public static DirectoryPath TestResultsDir { get; set; }
-    public static DirectoryPath ArtifactsDir { get; set; }
+    public static DirectoryPath VSTestResultsDir { get; set; }
     public static DirectoryPath AnalysisDir { get; set; }
     public static DirectoryPath OpenCoverDir { get; set; }
     public static FilePath OpenCoverXml { get; set; }
@@ -52,22 +29,13 @@ public static class BuildArtifactParameters
     public static DirectoryPath OutputDir { get; set; }
 }
 
-public class MSBuildProperty
-{
-    public MSBuildProperty(string name, params string[] values)
-    {
-        Name = name;
-        Values = values;
-    }
-
-    public string Name { get; private set; }
-    public string[] Values { get; private set; }
-}
-
 public static class BuildParameters
 {
     static BuildParameters()
     {
+        SolutionDir = new DirectoryPath(".");
+        ArtifactsDir = new DirectoryPath("../BuildArtifacts");
+        Solution = null;
         Version = null;
         DoTreatWarningsAsErrors = true;
         Configuration = "Release";
@@ -82,6 +50,8 @@ public static class BuildParameters
         NuGetSpecs = "../NuSpec/NuGet/";
     }
 
+    public static DirectoryPath SolutionDir { get; set; }
+    public static DirectoryPath ArtifactsDir { get; set; }
     public static FilePath Solution { get; set; }
     public static string Version { get; set; }
     public static bool DoTreatWarningsAsErrors { get; set; }
@@ -108,17 +78,70 @@ private bool IsSolutionFolder(SolutionProject project)
     return project.Type.Equals("{2150E333-8FDC-42A3-9474-1A3956D46DE8}");
 }
 
-Task("Info")
+Task("Initialize")
     .Does(() =>
 {
-    foreach (var path in GetFiles("*.sln"))
+    if (BuildParameters.Solution == null)
     {
-        BuildParameters.Solution = path;
+        BuildParameters.SolutionDir = MakeAbsolute(BuildParameters.SolutionDir);
+
+        Information("Searching for solution in directory {0}", BuildParameters.SolutionDir);
+
+        foreach (var path in GetFiles(BuildParameters.SolutionDir + "/*.sln"))
+        {
+            Information("Found solution {0}", path);
+            BuildParameters.Solution = path;
+            break;
+        }
+    }
+    else
+    {
+        BuildParameters.Solution = MakeAbsolute(BuildParameters.Solution);
+        BuildParameters.SolutionDir = BuildParameters.Solution.GetDirectory();
+
+        Information("Using specified solution {0}", BuildParameters.Solution);
     }
 
+    if (BuildParameters.Solution == null)
+    {
+        throw new Exception("Could not find solution (.sln) file");
+    }
+
+    BuildParameters.ArtifactsDir = MakeAbsolute(BuildParameters.ArtifactsDir);
+    BuildParameters.ChocolateySpecs = MakeAbsolute(BuildParameters.ChocolateySpecs);
+    BuildParameters.NuGetSpecs = MakeAbsolute(BuildParameters.NuGetSpecs);
+
+    BuildArtifactParameters.VSTestResultsDir = new DirectoryPath("TestResults");
+    BuildArtifactParameters.AnalysisDir = new DirectoryPath(BuildParameters.ArtifactsDir + "/Analysis");
+    BuildArtifactParameters.OpenCoverDir = new DirectoryPath(BuildArtifactParameters.AnalysisDir + "/OpenCover");
+    BuildArtifactParameters.OpenCoverXml = new FilePath(BuildArtifactParameters.OpenCoverDir + "/openCover.xml");
+    BuildArtifactParameters.VsTestDir = new DirectoryPath(BuildArtifactParameters.AnalysisDir + "/VSTest");
+    BuildArtifactParameters.VsMetricsDir = new DirectoryPath(BuildArtifactParameters.AnalysisDir + "/Metrics");
+    BuildArtifactParameters.VsMetricsXml = new FilePath(BuildArtifactParameters.VsMetricsDir + "/metrics.xml");
+    BuildArtifactParameters.DupFinderDir = new DirectoryPath(BuildArtifactParameters.AnalysisDir + "/DupFinder");
+    BuildArtifactParameters.DupFinderXml = new FilePath(BuildArtifactParameters.DupFinderDir + "/dupFinder.xml");
+    BuildArtifactParameters.DupFinderHtml = new FilePath(BuildArtifactParameters.DupFinderDir + "/dupFinder.html");
+    BuildArtifactParameters.InspectCodeDir = new DirectoryPath(BuildArtifactParameters.AnalysisDir + "/InspectCode");
+    BuildArtifactParameters.InspectCodeXml = new FilePath(BuildArtifactParameters.InspectCodeDir + "/inspectCode.xml");
+    BuildArtifactParameters.InspectCodeHtml = new FilePath(BuildArtifactParameters.InspectCodeDir + "/inspectCode.html");
+    BuildArtifactParameters.PackagesDir = new DirectoryPath(BuildParameters.ArtifactsDir + "/Packages");
+    BuildArtifactParameters.ChocolateyDir = new DirectoryPath(BuildArtifactParameters.PackagesDir + "/Chocolatey");
+    BuildArtifactParameters.NuGetDir = new DirectoryPath(BuildArtifactParameters.PackagesDir + "/NuGet");
+    BuildArtifactParameters.OutputDir = new DirectoryPath(BuildParameters.ArtifactsDir + "/Output");
+});
+
+Task("Info")
+    .IsDependentOn("Initialize")
+    .Does(() =>
+{
+    Information("Solution directory: {0}", BuildParameters.SolutionDir);
     Information("Solution: {0}", BuildParameters.Solution);
     Information("Version: {0}", BuildParameters.Version);
+    Information("Treating warnings as errors: {0}", BuildParameters.DoTreatWarningsAsErrors);
     Information("Configuration: {0}", BuildParameters.Configuration);
+    Information("Chocolatey .nuspec: {0}", BuildParameters.ChocolateySpecs);
+    Information("NuGet .nuspec: {0}", BuildParameters.NuGetSpecs);
+    Information("Artifacts are saved to: {0}", BuildParameters.ArtifactsDir);
 });
 
 Task("Clean")
@@ -131,8 +154,8 @@ Task("Clean")
         .UseToolVersion(BuildParameters.ToolVersion)
         .WithTarget("Clean");
 
-    CleanDirectory(BuildArtifactParameters.TestResultsDir);
-    CleanDirectory(BuildArtifactParameters.ArtifactsDir);
+    CleanDirectory(BuildArtifactParameters.VSTestResultsDir);
+    CleanDirectory(BuildParameters.ArtifactsDir);
 
     MSBuild(BuildParameters.Solution, settings);
 });
@@ -155,7 +178,7 @@ Task("InjectVersion")
 
     var versionRegex = @"\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+";
 
-    var assemblyInfoFiles = "./**/AssemblyInfo.cs";
+    var assemblyInfoFiles = BuildParameters.SolutionDir + "/**/AssemblyInfo.cs";
     var chocoFiles = BuildParameters.ChocolateySpecs + "/*.nuspec";
     var nugetFiles = BuildParameters.NuGetSpecs + "/*.nuspec";
 
@@ -200,10 +223,10 @@ Task("Build")
         var outputPath = project.Path.GetDirectory().Combine(parsedProject.OutputPath).FullPath + "/**/*";
         // The output path of WiX projects might contain some variable names which we have to correct using actual values:
         outputPath = outputPath.Replace("$(Platform)", parsedProject.Platform).Replace("$(Configuration)", parsedProject.Configuration);
-        var artifactsDir = new DirectoryPath(BuildArtifactParameters.OutputDir + "/" + project.Name);
+        var destinationDir = new DirectoryPath(BuildArtifactParameters.OutputDir + "/" + project.Name);
 
-        EnsureDirectoryExists(artifactsDir);
-        CopyFiles(outputPath, artifactsDir, true);
+        EnsureDirectoryExists(destinationDir);
+        CopyFiles(outputPath, destinationDir, true);
     }
 });
 
@@ -215,7 +238,7 @@ Task("VSTest")
     EnsureDirectoryExists(BuildArtifactParameters.VsTestDir);
 
     OpenCover(
-        tool => { tool.VSTest("**/bin/" + BuildParameters.Configuration + "/" + BuildParameters.TestDllWhitelist, new VSTestSettings().WithVisualStudioLogger()); },
+        tool => { tool.VSTest(BuildParameters.SolutionDir + "/**/bin/" + BuildParameters.Configuration + "/" + BuildParameters.TestDllWhitelist, new VSTestSettings().WithVisualStudioLogger()); },
         BuildArtifactParameters.OpenCoverXml,
         new OpenCoverSettings() { ReturnTargetCodeOffset = 0 }
             .WithFilter(BuildParameters.OpenCoverFilter)
@@ -223,9 +246,9 @@ Task("VSTest")
 })
 .Finally(() =>
 {
-    CopyFiles(BuildArtifactParameters.TestResultsDir + "/*", BuildArtifactParameters.VsTestDir);
+    CopyFiles(BuildArtifactParameters.VSTestResultsDir + "/*", BuildArtifactParameters.VsTestDir);
     ReportGenerator(BuildArtifactParameters.OpenCoverXml, BuildArtifactParameters.OpenCoverDir);
-    ReportUnit(BuildArtifactParameters.TestResultsDir, BuildArtifactParameters.VsTestDir, new ReportUnitSettings());
+    ReportUnit(BuildArtifactParameters.VSTestResultsDir, BuildArtifactParameters.VsTestDir, new ReportUnitSettings());
 });
 
 Task("VSMetrics")
@@ -303,6 +326,7 @@ Task("Analyze")
 });
 
 Task("CreatePackages")
+    .IsDependentOn("Build")
     .WithCriteria(() => DirectoryExists(BuildParameters.ChocolateySpecs))
     .Does(() =>
 {
