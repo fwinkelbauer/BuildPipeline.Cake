@@ -169,13 +169,9 @@ Task("Restore")
 
 Task("InjectVersion")
     .IsDependentOn("Info")
+    .WithCriteria(() => !string.IsNullOrWhiteSpace(BuildParameters.Version))
     .Does(() =>
 {
-    if (string.IsNullOrWhiteSpace(BuildParameters.Version))
-    {
-        throw new Exception("BuildParameters.Version cannot be null!");
-    }
-
     var versionRegex = @"\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+";
 
     var assemblyInfoFiles = BuildParameters.SolutionDir + "/**/AssemblyInfo.cs";
