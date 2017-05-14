@@ -1,4 +1,4 @@
-#load "../../Cake.BuildUtil/Content/build.cake"
+#load "../../Cake.Mug/Content/build.cake"
 
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
