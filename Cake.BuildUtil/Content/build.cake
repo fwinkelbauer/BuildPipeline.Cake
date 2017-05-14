@@ -303,7 +303,6 @@ Task("Analyze")
 });
 
 Task("CreatePackages")
-    .IsDependentOn("Analyze")
     .WithCriteria(() => DirectoryExists(BuildParameters.ChocolateySpecs))
     .Does(() =>
 {

@@ -8,6 +8,7 @@ BuildParameters.Version = "1.0.0.1";
 BuildParameters.AddMSBuildProperty("MyCustomProperty", "value1", "value2");
 
 Task("Default")
+    .IsDependentOn("Analyze")
     .IsDependentOn("CreatePackages")
     .IsDependentOn("CreateClickOnce")
     .Does(() =>
