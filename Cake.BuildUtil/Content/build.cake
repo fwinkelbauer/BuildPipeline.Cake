@@ -219,10 +219,7 @@ Task("Build")
             continue;
         }
 
-        var parsedProject = ParseProject(project.Path);
-        var outputPath = project.Path.GetDirectory().Combine(parsedProject.OutputPath).FullPath + "/**/*";
-        // The output path of WiX projects might contain some variable names which we have to correct using actual values:
-        outputPath = outputPath.Replace("$(Platform)", parsedProject.Platform).Replace("$(Configuration)", parsedProject.Configuration);
+        var outputPath = project.Path.GetDirectory() + "/bin/" + BuildParameters.Configuration + "/**/*";
         var destinationDir = new DirectoryPath(BuildArtifactParameters.OutputDir + "/" + project.Name);
 
         EnsureDirectoryExists(destinationDir);
@@ -272,8 +269,7 @@ Task("VSMetrics")
             continue;
         }
 
-        var parseResult = ParseProject(project.Path);
-        var partialOutputPath = project.Path.GetDirectory().Combine(parseResult.OutputPath).FullPath + "/" + parseResult.AssemblyName;
+        var partialOutputPath = project.Path.GetDirectory() + "/bin/" + BuildParameters.Configuration + "/" + project.Name;
 
         projectOutputs.Add(GetFiles(partialOutputPath + ".exe"));
         projectOutputs.Add(GetFiles(partialOutputPath + ".dll"));
