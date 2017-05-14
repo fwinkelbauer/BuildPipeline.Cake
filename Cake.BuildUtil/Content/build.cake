@@ -179,8 +179,8 @@ Task("InjectVersion")
     var versionRegex = @"\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+";
 
     var assemblyInfoFiles = BuildParameters.SolutionDir + "/**/AssemblyInfo.cs";
-    var chocoFiles = BuildParameters.ChocolateySpecs + "/*.nuspec";
-    var nugetFiles = BuildParameters.NuGetSpecs + "/*.nuspec";
+    var chocoFiles = BuildParameters.ChocolateySpecs + "/**/*.nuspec";
+    var nugetFiles = BuildParameters.NuGetSpecs + "/**/*.nuspec";
 
     ReplaceRegexInFiles(assemblyInfoFiles, versionRegex, BuildParameters.Version);
     ReplaceRegexInFiles(chocoFiles, versionRegex, BuildParameters.Version);
@@ -333,12 +333,12 @@ Task("CreatePackages")
     EnsureDirectoryExists(BuildArtifactParameters.ChocolateyDir);
     EnsureDirectoryExists(BuildArtifactParameters.NuGetDir);
 
-    foreach (var nuspec in GetFiles(BuildParameters.ChocolateySpecs + "/*.nuspec"))
+    foreach (var nuspec in GetFiles(BuildParameters.ChocolateySpecs + "/**/*.nuspec"))
     {
         ChocolateyPack(nuspec, new ChocolateyPackSettings() { OutputDirectory = BuildArtifactParameters.ChocolateyDir });
     }
 
-    foreach (var nuspec in GetFiles(BuildParameters.NuGetSpecs + "/*.nuspec"))
+    foreach (var nuspec in GetFiles(BuildParameters.NuGetSpecs + "/**/*.nuspec"))
     {
         NuGetPack(nuspec, new NuGetPackSettings() { OutputDirectory = BuildArtifactParameters.NuGetDir });
     }
