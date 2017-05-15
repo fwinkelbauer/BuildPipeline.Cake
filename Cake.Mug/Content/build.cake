@@ -136,7 +136,6 @@ Task("Info")
 {
     Information("Solution directory: {0}", BuildParameters.SolutionDir);
     Information("Solution: {0}", BuildParameters.Solution);
-    Information("Version: {0}", BuildParameters.Version);
     Information("Treating warnings as errors: {0}", BuildParameters.DoTreatWarningsAsErrors);
     Information("Configuration: {0}", BuildParameters.Configuration);
     Information("Chocolatey .nuspec: {0}", BuildParameters.ChocolateySpecs);
@@ -168,10 +167,11 @@ Task("Restore")
 });
 
 Task("InjectVersion")
-    .IsDependentOn("Info")
+    .IsDependentOn("Initialize")
     .WithCriteria(() => !string.IsNullOrWhiteSpace(BuildParameters.Version))
     .Does(() =>
 {
+    Information("Injecting version: {0}", BuildParameters.Version);
     var versionRegex = @"\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+";
 
     var assemblyInfoFiles = BuildParameters.SolutionDir + "/**/AssemblyInfo.cs";
