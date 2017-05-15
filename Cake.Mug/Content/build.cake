@@ -111,6 +111,8 @@ Task("Initialize")
     BuildParameters.ChocolateySpecs = MakeAbsolute(BuildParameters.ChocolateySpecs);
     BuildParameters.NuGetSpecs = MakeAbsolute(BuildParameters.NuGetSpecs);
 
+    // the TestResults directory is set relative to the current working directory as we cannot specify
+    // an alternative tool path for VSTest (even though VSTestSettings offers a WorkingDirectory property)
     BuildArtifactParameters.VSTestResultsDir = new DirectoryPath("TestResults");
     BuildArtifactParameters.AnalysisDir = new DirectoryPath(BuildParameters.ArtifactsDir + "/Analysis");
     BuildArtifactParameters.OpenCoverDir = new DirectoryPath(BuildArtifactParameters.AnalysisDir + "/OpenCover");
