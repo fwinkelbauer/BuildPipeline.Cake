@@ -6,7 +6,6 @@
 
 #addin nuget:?package=Cake.ReSharperReports&version=0.6.0
 #addin nuget:?package=Cake.VsMetrics&version=0.2.0
-#addin nuget:?package=Cake.FileHelpers&version=1.0.4
 
 public static class BuildArtifactParameters
 {
@@ -36,7 +35,6 @@ public static class BuildParameters
         SolutionDir = new DirectoryPath(".");
         ArtifactsDir = new DirectoryPath("../BuildArtifacts");
         Solution = null;
-        Version = null;
         DoTreatWarningsAsErrors = true;
         Configuration = "Release";
         ToolVersion = MSBuildToolVersion.Default;
@@ -53,7 +51,6 @@ public static class BuildParameters
     public static DirectoryPath SolutionDir { get; set; }
     public static DirectoryPath ArtifactsDir { get; set; }
     public static FilePath Solution { get; set; }
-    public static string Version { get; set; }
     public static bool DoTreatWarningsAsErrors { get; set; }
     public static string Configuration { get; set; }
     public static MSBuildToolVersion ToolVersion { get; set; }
@@ -168,26 +165,8 @@ Task("Restore")
     NuGetRestore(BuildParameters.Solution);
 });
 
-Task("InjectVersion")
-    .IsDependentOn("Initialize")
-    .WithCriteria(() => !string.IsNullOrWhiteSpace(BuildParameters.Version))
-    .Does(() =>
-{
-    Information("Injecting version: {0}", BuildParameters.Version);
-    var versionRegex = @"\d+\.\d+\.\d+\.\d+|\d+\.\d+\.\d+";
-
-    var assemblyInfoFiles = BuildParameters.SolutionDir + "/**/AssemblyInfo.cs";
-    var chocoFiles = BuildParameters.ChocolateySpecs + "/**/*.nuspec";
-    var nugetFiles = BuildParameters.NuGetSpecs + "/**/*.nuspec";
-
-    ReplaceRegexInFiles(assemblyInfoFiles, versionRegex, BuildParameters.Version);
-    ReplaceRegexInFiles(chocoFiles, versionRegex, BuildParameters.Version);
-    ReplaceRegexInFiles(nugetFiles, versionRegex, BuildParameters.Version);
-});
-
 Task("Build")
     .IsDependentOn("Restore")
-    .IsDependentOn("InjectVersion")
     .Does(() =>
 {
     Information("MSBuild version: {0}", BuildParameters.ToolVersion);
