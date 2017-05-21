@@ -108,8 +108,8 @@ Task("Info")
     Information("Solution: {0}", BuildParameters.Solution);
     Information("Treating warnings as errors: {0}", BuildParameters.DoTreatWarningsAsErrors);
     Information("Configuration: {0}", BuildParameters.Configuration);
-    Information("Chocolatey .nuspec: {0}", BuildParameters.ChocolateySpecs);
-    Information("NuGet .nuspec: {0}", BuildParameters.NuGetSpecs);
+    Information("Chocolatey .nuspec directory: {0}", BuildParameters.ChocolateySpecs);
+    Information("NuGet .nuspec directory: {0}", BuildParameters.NuGetSpecs);
     Information("Artifacts are saved to: {0}", BuildParameters.ArtifactsDir);
 });
 

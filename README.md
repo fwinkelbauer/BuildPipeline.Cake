@@ -32,11 +32,11 @@ Run `.\build.ps1` in the `SampleApplication\Source` folder for an example. All o
 
 ## Tools
 
-A list of all tools which are used by Cake.Mug can be found [here](.\Cake.Mug.Tools\Content\tools.cake). You can skip the load operation for the Cake.Mug.Tools package if all specified tools are reachable through the `PATH` environment variable. This can for example be achieved by installing all tools through [Chocolatey](http://chocolatey.org/).
+A list of all tools which are used by Cake.Mug can be found [here](Cake.Mug.Tools/Content/tools.cake). You can skip the load operation for the Cake.Mug.Tools package if all specified tools are reachable through the `PATH` environment variable. This can for example be achieved by installing all tools through [Chocolatey](http://chocolatey.org/).
 
 ## Configuration
 
-Cake.Mug can be configured through several parameters. All configuration has to be done before the `Initialize` task is called. See [configuration.cake](.\Cake.Mug\Content\configuration.cake) to learn more about all configuration options.
+Cake.Mug can be configured through several parameters. All configuration has to be done before the `Initialize` task is called. See [configuration.cake](Cake.Mug/Content/configuration.cake) to learn more about all configuration options.
 
 ## Tasks
 
