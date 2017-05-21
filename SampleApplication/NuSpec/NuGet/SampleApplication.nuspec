@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>SampleApplication</id>
-    <version>1.0.0.1</version>
+    <version>0.0.0</version>
     <title>SampleApplication</title>
     <authors>Jon Doe</authors>
     <description>This is just an example</description>
