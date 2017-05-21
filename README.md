@@ -7,7 +7,7 @@ This is a custom [Cake](http://cakebuild.net/) script to build C# projects.
 A very simplistic `build.cake` script that utilizes Cake.Mug could look like this:
 
 ```csharp
-// Load all tools that Cake.Mug needs. This operation can be skipped if all necessary tools can be reached through the PATH environment variable
+// Load all tools that Cake.Mug needs
 #load "nuget:?package:cake.mug.tools"
 // Load Cake.Mug
 #load "nuget:?package:cake.mug"
@@ -29,6 +29,10 @@ RunTarget(target);
 ```
 
 Run `.\build.ps1` in the `SampleApplication\Source` folder for an example. All output can be found in `SampleApplication\BuildArtifacts`.
+
+## Tools
+
+A list of all tools which are used by Cake.Mug can be found [here](.\Cake.Mug.Tools\Content\tools.cake). You can skip the load operation for the Cake.Mug.Tools package if all specified tools are reachable through the `PATH` environment variable. This can for example be achieved by installing all tools through [Chocolatey](http://chocolatey.org/).
 
 ## Configuration
 
