@@ -37,13 +37,10 @@ public static class BuildParameters
         Solution = null;
         DoTreatWarningsAsErrors = true;
         Configuration = "Release";
-        ToolVersion = MSBuildToolVersion.Default;
-        Platform = MSBuildPlatform.Automatic;
         TestDllWhitelist = "*.Tests*.dll";
         OpenCoverFilter = "+[*]* -[*Test*]*";
         OpenCoverExcludeByFile = "*/*Designer.cs;*/*.g.cs;*/*.g.i.cs";
         DupFinderExcludePattern = new string[] {};
-        MSBuildProperties = new Dictionary<string, string[]>();
         ChocolateySpecs = "../NuSpec/Chocolatey/";
         NuGetSpecs = "../NuSpec/NuGet/";
     }
@@ -53,20 +50,12 @@ public static class BuildParameters
     public static FilePath Solution { get; set; }
     public static bool DoTreatWarningsAsErrors { get; set; }
     public static string Configuration { get; set; }
-    public static MSBuildToolVersion ToolVersion { get; set; }
-    public static MSBuildPlatform Platform { get; set; }
     public static string TestDllWhitelist { get; set; }
     public static string OpenCoverFilter { get; set; }
     public static string OpenCoverExcludeByFile { get; set; }
     public static string[] DupFinderExcludePattern { get; set; }
-    public static IDictionary<string, string[]> MSBuildProperties { get; private set; }
     public static DirectoryPath ChocolateySpecs { get; set; }
     public static DirectoryPath NuGetSpecs { get; set; }
-
-    public static void AddMSBuildProperty(string name, params string[] values)
-    {
-        MSBuildProperties.Add(name, values);
-    }
 }
 
 public static class SolutionProperties
@@ -164,8 +153,6 @@ Task("Clean")
 {
     MSBuildSettings settings = new MSBuildSettings()
         .SetConfiguration(BuildParameters.Configuration)
-        .SetMSBuildPlatform(BuildParameters.Platform)
-        .UseToolVersion(BuildParameters.ToolVersion)
         .WithTarget("Clean");
 
     CleanDirectory(BuildArtifactParameters.VSTestResultsDir);
@@ -185,22 +172,12 @@ Task("Build")
     .IsDependentOn("Restore")
     .Does(() =>
 {
-    Information("MSBuild version: {0}", BuildParameters.ToolVersion);
-    Information("Platform: {0}", BuildParameters.Platform);
-
     MSBuildSettings settings = new MSBuildSettings()
-        .SetConfiguration(BuildParameters.Configuration)
-        .SetMSBuildPlatform(BuildParameters.Platform)
-        .UseToolVersion(BuildParameters.ToolVersion);
+        .SetConfiguration(BuildParameters.Configuration);
 
     if (BuildParameters.DoTreatWarningsAsErrors)
     {
         settings.WithProperty("TreatWarningsAsErrors", "true");
-    }
-
-    foreach (KeyValuePair<string, string[]> entry in BuildParameters.MSBuildProperties)
-    {
-        settings.WithProperty(entry.Key, entry.Value);
     }
 
     MSBuild(BuildParameters.Solution, settings);

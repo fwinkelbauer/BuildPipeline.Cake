@@ -1,12 +1,7 @@
 #load "../../Cake.Mug/Content/build.cake"
 
-#addin nuget:?package=Cake.FileHelpers&version=1.0.4
-
 var target = Argument("target", "Default");
-var configuration = Argument("configuration", "Release");
-
-BuildParameters.Configuration = configuration;
-BuildParameters.AddMSBuildProperty("MyCustomProperty", "value1", "value2");
+BuildParameters.Configuration = Argument("configuration", "Release");
 
 Task("Default")
     .IsDependentOn("Analyze")
