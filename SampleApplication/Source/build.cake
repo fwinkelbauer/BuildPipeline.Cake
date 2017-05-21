@@ -6,12 +6,11 @@ BuildParameters.Configuration = Argument("configuration", "Release");
 Task("Default")
     .IsDependentOn("Analyze")
     .IsDependentOn("CreatePackages")
-    .IsDependentOn("CreateClickOnce")
     .Does(() =>
 {
 });
 
-Task("CreateClickOnce")
+Task("PublishClickOnce")
     .IsDependentOn("Initialize")
     .Does(() =>
 {
