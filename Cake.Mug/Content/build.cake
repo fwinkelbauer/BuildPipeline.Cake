@@ -28,36 +28,6 @@ public static class BuildArtifactParameters
     public static DirectoryPath OutputDir { get; set; }
 }
 
-public static class BuildParameters
-{
-    static BuildParameters()
-    {
-        SolutionDir = new DirectoryPath(".");
-        ArtifactsDir = new DirectoryPath("../BuildArtifacts");
-        Solution = null;
-        DoTreatWarningsAsErrors = true;
-        Configuration = "Release";
-        TestDllWhitelist = "*.Tests*.dll";
-        OpenCoverFilter = "+[*]* -[*Test*]*";
-        OpenCoverExcludeByFile = "*/*Designer.cs;*/*.g.cs;*/*.g.i.cs";
-        DupFinderExcludePattern = new string[] {};
-        ChocolateySpecs = "../NuSpec/Chocolatey/";
-        NuGetSpecs = "../NuSpec/NuGet/";
-    }
-
-    public static DirectoryPath SolutionDir { get; set; }
-    public static DirectoryPath ArtifactsDir { get; set; }
-    public static FilePath Solution { get; set; }
-    public static bool DoTreatWarningsAsErrors { get; set; }
-    public static string Configuration { get; set; }
-    public static string TestDllWhitelist { get; set; }
-    public static string OpenCoverFilter { get; set; }
-    public static string OpenCoverExcludeByFile { get; set; }
-    public static string[] DupFinderExcludePattern { get; set; }
-    public static DirectoryPath ChocolateySpecs { get; set; }
-    public static DirectoryPath NuGetSpecs { get; set; }
-}
-
 public static class SolutionProperties
 {
     static SolutionProperties()

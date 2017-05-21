@@ -1,3 +1,4 @@
+#load "../../Cake.Mug/Content/configuration.cake"
 #load "../../Cake.Mug/Content/build.cake"
 
 var target = Argument("target", "Default");
