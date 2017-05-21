@@ -1,9 +1,3 @@
-#tool nuget:?package=JetBrains.ReSharper.CommandLineTools&version=2017.1.20170428.83814
-#tool nuget:?package=OpenCover&version=4.6.519
-#tool nuget:?package=ReportGenerator&version=2.5.7
-#tool nuget:?package=ReportUnit&version=1.2.1
-#tool nuget:?package=ReSharperReports&version=0.4.0
-
 #addin nuget:?package=Cake.ReSharperReports&version=0.6.0
 #addin nuget:?package=Cake.VsMetrics&version=0.2.0
 
@@ -45,6 +39,7 @@ private bool IsSolutionFolder(SolutionProject project)
 }
 
 Task("Initialize")
+    .Description("Cake.Mug: Initializes all values")
     .Does(() =>
 {
     if (BuildParameters.Solution == null)
@@ -105,6 +100,7 @@ Task("Initialize")
 });
 
 Task("Info")
+    .Description("Cake.Mug: Prints vital information")
     .IsDependentOn("Initialize")
     .Does(() =>
 {
@@ -118,6 +114,7 @@ Task("Info")
 });
 
 Task("Clean")
+    .Description("Cake.Mug: Cleans the solution, the build artifacts folder and the 'TestResults' folder")
     .IsDependentOn("Info")
     .Does(() =>
 {
@@ -132,6 +129,7 @@ Task("Clean")
 });
 
 Task("Restore")
+    .Description("Cake.Mug: Restores all NuGet packages used by the solution")
     .IsDependentOn("Clean")
     .Does(() =>
 {
@@ -139,6 +137,7 @@ Task("Restore")
 });
 
 Task("Build")
+    .Description("Cake.Mug: Builds the solution")
     .IsDependentOn("Restore")
     .Does(() =>
 {
@@ -168,6 +167,7 @@ Task("Build")
 });
 
 Task("VSTest")
+    .Description("Cake.Mug: Runs VSTest and OpenCover")
     .IsDependentOn("Build")
     .Does(() =>
 {
@@ -189,6 +189,7 @@ Task("VSTest")
 });
 
 Task("VSMetrics")
+    .Description("Cake.Mug: Calculates code metrics of the solution using metrics.exe")
     .IsDependentOn("Build")
     .Does(() =>
 {
@@ -219,6 +220,7 @@ Task("VSMetrics")
 });
 
 Task("DupFinder")
+    .Description("Cake.Mug: Analyses the solution using dupfinder.exe")
     .IsDependentOn("Info")
     .Does(() =>
 {
@@ -237,6 +239,7 @@ Task("DupFinder")
 });
 
 Task("InspectCode")
+    .Description("Cake.Mug: Analyses the solution using inspectcode.exe")
     .IsDependentOn("Info")
     .Does(() =>
 {
@@ -253,6 +256,7 @@ Task("InspectCode")
 });
 
 Task("Analyze")
+    .Description("Cake.Mug: A wrapper task for all analytical tasks")
     .IsDependentOn("VSTest")
     .IsDependentOn("VSMetrics")
     .IsDependentOn("DupFinder")
@@ -262,6 +266,7 @@ Task("Analyze")
 });
 
 Task("CreatePackages")
+    .Description("Cake.Mug: Creates Chocolatey and NuGet packages")
     .IsDependentOn("Build")
     .WithCriteria(() => DirectoryExists(BuildParameters.ChocolateySpecs))
     .Does(() =>

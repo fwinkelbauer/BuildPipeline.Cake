@@ -7,6 +7,8 @@ This is a custom [Cake](http://cakebuild.net/) script to build C# projects.
 A very simplistic `build.cake` script that utilizes Cake.Mug could look like this:
 
 ```csharp
+// Load all tools that Cake.Mug needs. This operation can be skipped if all necessary tools can be reached through the PATH environment variable
+#load "nuget:?package:cake.mug.tools"
 // Load Cake.Mug
 #load "nuget:?package:cake.mug"
 

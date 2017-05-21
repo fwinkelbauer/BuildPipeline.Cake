@@ -1,3 +1,4 @@
+#load "../../Cake.Mug.Tools/Content/tools.cake"
 #load "../../Cake.Mug/Content/configuration.cake"
 #load "../../Cake.Mug/Content/build.cake"
 
