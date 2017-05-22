@@ -158,7 +158,7 @@ Task("Build")
             continue;
         }
 
-        var outputPath = project.Path.GetDirectory() + "/bin/" + BuildParameters.Configuration + "/**/*";
+        var outputPath = project.Path.GetDirectory() + "/bin/**/" + BuildParameters.Configuration + "/**/*";
         var destinationDir = new DirectoryPath(BuildArtifactParameters.OutputDir + "/" + project.Name);
 
         EnsureDirectoryExists(destinationDir);
@@ -175,7 +175,7 @@ Task("VSTest")
     EnsureDirectoryExists(BuildArtifactParameters.VsTestDir);
 
     OpenCover(
-        tool => { tool.VSTest(BuildParameters.SolutionDir + "/**/bin/" + BuildParameters.Configuration + "/" + BuildParameters.TestDllWhitelist, new VSTestSettings().WithVisualStudioLogger()); },
+        tool => { tool.VSTest(BuildArtifactParameters.OutputDir + "/**/" + BuildParameters.TestDllWhitelist, new VSTestSettings().WithVisualStudioLogger()); },
         BuildArtifactParameters.OpenCoverXml,
         new OpenCoverSettings() { ReturnTargetCodeOffset = 0 }
             .WithFilter(BuildParameters.OpenCoverFilter)
@@ -210,10 +210,8 @@ Task("VSMetrics")
             continue;
         }
 
-        var partialOutputPath = project.Path.GetDirectory() + "/bin/" + BuildParameters.Configuration + "/" + project.Name;
-
-        projectOutputs.Add(GetFiles(partialOutputPath + ".exe"));
-        projectOutputs.Add(GetFiles(partialOutputPath + ".dll"));
+        projectOutputs.Add(GetFiles(BuildArtifactParameters.OutputDir + "/" + project.Name + "/" + project.Name + ".exe"));
+        projectOutputs.Add(GetFiles(BuildArtifactParameters.OutputDir + "/" + project.Name + "/" + project.Name + ".dll"));
     }
 
     VsMetrics(projectOutputs, BuildArtifactParameters.VsMetricsXml);
