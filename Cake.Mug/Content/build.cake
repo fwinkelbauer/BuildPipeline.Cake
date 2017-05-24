@@ -263,16 +263,20 @@ Task("Analyze")
 {
 });
 
-Task("CreatePackages")
-    .Description("Cake.Mug: Creates Chocolatey and NuGet packages")
+Task("CreateChocolateyPackages")
+    .Description("Cake.Mug: Creates Chocolatey packages")
     .IsDependentOn("Build")
     .WithCriteria(() => DirectoryExists(BuildParameters.ChocolateySpecs))
     .Does(() =>
 {
-    EnsureDirectoryExists(BuildArtifactParameters.ChocolateyDir);
-    EnsureDirectoryExists(BuildArtifactParameters.NuGetDir);
+    var chocolateySpecs = GetFiles(BuildParameters.ChocolateySpecs + "/**/*.nuspec");
 
-    foreach (var nuspec in GetFiles(BuildParameters.ChocolateySpecs + "/**/*.nuspec"))
+    if (chocolateySpecs.Count > 0)
+    {
+        EnsureDirectoryExists(BuildArtifactParameters.ChocolateyDir);
+    }
+
+    foreach (var nuspec in chocolateySpecs)
     {
         var settings = new ChocolateyPackSettings() { OutputDirectory = BuildArtifactParameters.ChocolateyDir };
         AssemblyInfoParseResult assemblyInfo = null;
@@ -286,8 +290,22 @@ Task("CreatePackages")
 
         ChocolateyPack(nuspec, settings);
     }
+});
 
-    foreach (var nuspec in GetFiles(BuildParameters.NuGetSpecs + "/**/*.nuspec"))
+Task("CreateNuGetPackages")
+    .Description("Cake.Mug: Creates NuGet packages")
+    .IsDependentOn("Build")
+    .WithCriteria(() => DirectoryExists(BuildParameters.NuGetSpecs))
+    .Does(() =>
+{
+    var nuGetSpecs = GetFiles(BuildParameters.NuGetSpecs + "/**/*.nuspec");
+
+    if (nuGetSpecs.Count > 0)
+    {
+        EnsureDirectoryExists(BuildArtifactParameters.NuGetDir);
+    }
+
+    foreach (var nuspec in nuGetSpecs)
     {
         var settings = new NuGetPackSettings() { OutputDirectory = BuildArtifactParameters.NuGetDir };
         AssemblyInfoParseResult assemblyInfo = null;
@@ -301,4 +319,12 @@ Task("CreatePackages")
 
         NuGetPack(nuspec, settings);
     }
+});
+
+Task("CreatePackages")
+    .Description("Cake.Mug: A wrapper task for packaging tasks")
+    .IsDependentOn("CreateChocolateyPackages")
+    .IsDependentOn("CreateNuGetPackages")
+    .Does(() =>
+{
 });

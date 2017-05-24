@@ -104,11 +104,22 @@ Runs the [ReSharper tool](https://www.jetbrains.com/resharper/features/command-l
 
 A wrapper task which can be used to run all analytical tasks.
 
-### CreatePackages
+## CreateChocolateyPackages
 
 **Depends on:** `Build`
 
-Builds Chocolatey and NuGet packages based on `.nuspec` files. All packages can be found in the `BuildArtifacts` folder.
+Builds Chocolatey packages based on `.nuspec` files. If the name of a `.nuspec` file matches the name of a project in the solution (indicated through the `AssemblyProduct` attribute in a `AssemblyInfo.cs` file) the version of the created package is set to the `AssemblyVersion` attribute. All packages can be found in the `BuildArtifacts` folder.
+
+## CreateNuGetPackages
+
+**Depends on:** `Build`
+
+Builds NuGet packages based on `.nuspec` files. If the name of a `.nuspec` file matches the name of a project in the solution (indicated through the `AssemblyProduct` attribute in a `AssemblyInfo.cs` file) the version of the created package is set to the `AssemblyVersion` attribute. All packages can be found in the `BuildArtifacts` folder.
+### CreatePackages
+
+**Depends on:** `CreateChocolateyPackages`, `CreateNuGetPackages`
+
+A wrapper task which can be used to run all packaging tasks.
 
 ## License
 
