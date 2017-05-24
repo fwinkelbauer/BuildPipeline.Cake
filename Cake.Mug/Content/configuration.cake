@@ -11,6 +11,7 @@ public static class BuildParameters
         OpenCoverFilter = "+[*]* -[*Test*]*";
         OpenCoverExcludeByFile = "*/*Designer.cs;*/*.g.cs;*/*.g.i.cs";
         DupFinderExcludePattern = new string[] {};
+        DupFinderThrowExceptionIfDuplication = true;
         ChocolateySpecs = "../NuSpec/Chocolatey/";
         NuGetSpecs = "../NuSpec/NuGet/";
     }
@@ -68,6 +69,12 @@ public static class BuildParameters
     /// </summary>
     /// <value>An array of excluded files</value>
     public static string[] DupFinderExcludePattern { get; set; }
+
+    /// <summary>
+    /// Gets or sets the DupFinder flag to indicate if it should throw an Exception when duplicates are found
+    /// </summary>
+    /// <value>If DupFinder should throw an Exception when duplicates are found</value>
+    public static bool DupFinderThrowExceptionIfDuplication { get; set; }
 
     /// <summary>
     /// Gets or sets the specified Chocolatey NuSpec directory

@@ -228,7 +228,7 @@ Task("DupFinder")
         ShowStats = true,
         ShowText = true,
         OutputFile = BuildArtifactParameters.DupFinderXml,
-        ThrowExceptionOnFindingDuplicates = true,
+        ThrowExceptionOnFindingDuplicates = BuildParameters.DupFinderThrowExceptionIfDuplication,
         ExcludePattern = BuildParameters.DupFinderExcludePattern });
 })
 .Finally(() =>
