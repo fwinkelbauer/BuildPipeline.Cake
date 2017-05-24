@@ -214,7 +214,7 @@ Task("VSMetrics")
         projectOutputs.Add(GetFiles(BuildArtifactParameters.OutputDir + "/" + project.Name + "/" + project.Name + ".dll"));
     }
 
-    VsMetrics(projectOutputs, BuildArtifactParameters.VsMetricsXml);
+    VsMetrics(projectOutputs, BuildArtifactParameters.VsMetricsXml, new VsMetricsSettings() { IgnoreGeneratedCode = true, SearchGac = true });
 });
 
 Task("DupFinder")
