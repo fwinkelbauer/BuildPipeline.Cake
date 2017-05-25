@@ -1,5 +1,6 @@
 *.suo
 *.user
+*.nupkg
 **/bin
 **/obj
 **/TestResults/
