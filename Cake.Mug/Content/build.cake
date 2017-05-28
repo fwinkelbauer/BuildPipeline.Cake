@@ -3,11 +3,11 @@
 
 public static class BuildArtifactParameters
 {
-    public static DirectoryPath VSTestResultsDir { get; set; }
+    public static DirectoryPath MSTestResultsDir { get; set; }
     public static DirectoryPath AnalysisDir { get; set; }
     public static DirectoryPath OpenCoverDir { get; set; }
     public static FilePath OpenCoverXml { get; set; }
-    public static DirectoryPath VsTestDir { get; set; }
+    public static DirectoryPath MSTestDir { get; set; }
     public static DirectoryPath VsMetricsDir { get; set; }
     public static FilePath VsMetricsXml { get; set; }
     public static DirectoryPath DupFinderDir { get; set; }
@@ -72,13 +72,13 @@ Task("Initialize")
     BuildParameters.ChocolateySpecs = MakeAbsolute(BuildParameters.ChocolateySpecs);
     BuildParameters.NuGetSpecs = MakeAbsolute(BuildParameters.NuGetSpecs);
 
-    // the TestResults directory is set relative to the current working directory as we cannot specify
-    // an alternative tool path for VSTest (even though VSTestSettings offers a WorkingDirectory property)
-    BuildArtifactParameters.VSTestResultsDir = new DirectoryPath("TestResults");
+    // The TestResults directory is set relative to the current working directory as we cannot specify
+    // an alternative tool path for MSTest (even though MSTestSettings offers a WorkingDirectory property)
+    BuildArtifactParameters.MSTestResultsDir = new DirectoryPath("TestResults");
     BuildArtifactParameters.AnalysisDir = new DirectoryPath(BuildParameters.ArtifactsDir + "/Analysis");
     BuildArtifactParameters.OpenCoverDir = new DirectoryPath(BuildArtifactParameters.AnalysisDir + "/OpenCover");
     BuildArtifactParameters.OpenCoverXml = new FilePath(BuildArtifactParameters.OpenCoverDir + "/openCover.xml");
-    BuildArtifactParameters.VsTestDir = new DirectoryPath(BuildArtifactParameters.AnalysisDir + "/VSTest");
+    BuildArtifactParameters.MSTestDir = new DirectoryPath(BuildArtifactParameters.AnalysisDir + "/MSTest");
     BuildArtifactParameters.VsMetricsDir = new DirectoryPath(BuildArtifactParameters.AnalysisDir + "/Metrics");
     BuildArtifactParameters.VsMetricsXml = new FilePath(BuildArtifactParameters.VsMetricsDir + "/metrics.xml");
     BuildArtifactParameters.DupFinderDir = new DirectoryPath(BuildArtifactParameters.AnalysisDir + "/DupFinder");
@@ -122,7 +122,7 @@ Task("Clean")
         .SetConfiguration(BuildParameters.Configuration)
         .WithTarget("Clean");
 
-    CleanDirectory(BuildArtifactParameters.VSTestResultsDir);
+    CleanDirectory(BuildArtifactParameters.MSTestResultsDir);
     CleanDirectory(BuildParameters.ArtifactsDir);
 
     MSBuild(BuildParameters.Solution, settings);
@@ -166,16 +166,16 @@ Task("Build")
     }
 });
 
-Task("VSTest")
-    .Description("Cake.Mug: Runs VSTest and OpenCover")
+Task("MSTest")
+    .Description("Cake.Mug: Runs MSTest and OpenCover")
     .IsDependentOn("Build")
     .Does(() =>
 {
     EnsureDirectoryExists(BuildArtifactParameters.OpenCoverDir);
-    EnsureDirectoryExists(BuildArtifactParameters.VsTestDir);
+    EnsureDirectoryExists(BuildArtifactParameters.MSTestDir);
 
     OpenCover(
-        tool => { tool.VSTest(BuildArtifactParameters.OutputDir + "/**/" + BuildParameters.TestDllWhitelist, new VSTestSettings().WithVisualStudioLogger()); },
+        tool => { tool.MSTest(BuildArtifactParameters.OutputDir + "/**/" + BuildParameters.TestDllWhitelist); },
         BuildArtifactParameters.OpenCoverXml,
         new OpenCoverSettings() { ReturnTargetCodeOffset = 0 }
             .WithFilter(BuildParameters.OpenCoverFilter)
@@ -183,9 +183,9 @@ Task("VSTest")
 })
 .Finally(() =>
 {
-    CopyFiles(BuildArtifactParameters.VSTestResultsDir + "/*", BuildArtifactParameters.VsTestDir);
+    CopyFiles(BuildArtifactParameters.MSTestResultsDir + "/*", BuildArtifactParameters.MSTestDir);
     ReportGenerator(BuildArtifactParameters.OpenCoverXml, BuildArtifactParameters.OpenCoverDir);
-    ReportUnit(BuildArtifactParameters.VSTestResultsDir, BuildArtifactParameters.VsTestDir, new ReportUnitSettings());
+    ReportUnit(BuildArtifactParameters.MSTestResultsDir, BuildArtifactParameters.MSTestDir, new ReportUnitSettings());
 });
 
 Task("VSMetrics")
@@ -255,7 +255,7 @@ Task("InspectCode")
 
 Task("Analyze")
     .Description("Cake.Mug: A wrapper task for all analytical tasks")
-    .IsDependentOn("VSTest")
+    .IsDependentOn("MSTest")
     .IsDependentOn("VSMetrics")
     .IsDependentOn("DupFinder")
     .IsDependentOn("InspectCode")
