@@ -8,9 +8,9 @@ A very simplistic `build.cake` script that utilizes Cake.Mug could look like thi
 
 ```csharp
 // Load all tools that Cake.Mug needs
-#load "nuget:?package:cake.mug.tools"
+#load "nuget:?package=cake.mug.tools"
 // Load Cake.Mug
-#load "nuget:?package:cake.mug"
+#load "nuget:?package=cake.mug"
 
 var target = Argument("target", "Default");
 // Set the configuration option for Cake.Mug's build process
