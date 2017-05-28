@@ -7,7 +7,7 @@ public static class BuildParameters
         Solution = null;
         DoTreatWarningsAsErrors = true;
         Configuration = "Release";
-        TestDllWhitelist = "*.Tests*.dll";
+        TestDllWhitelist = "*Tests*.dll";
         OpenCoverFilter = "+[*]* -[*Test*]*";
         OpenCoverExcludeByFile = "*/*Designer.cs;*/*.g.cs;*/*.g.i.cs";
         DupFinderExcludePattern = new string[] {};
