@@ -34,9 +34,16 @@ Run `.\build.ps1` in the `SampleApplication\Source` folder for an example. All o
 
 A list of all tools which are used by Cake.Mug can be found [here](Cake.Mug.Tools/Content/tools.cake). You can skip the load operation for the Cake.Mug.Tools package if all specified tools are reachable through the `PATH` environment variable. This can for example be achieved by installing all tools through [Chocolatey](http://chocolatey.org/).
 
-## Configuration
+## Conventions / Configuration
 
-Cake.Mug can be configured through several parameters. All configuration has to be done before the `Initialize` task is called. See [configuration.cake](Cake.Mug/Content/configuration.cake) to learn more about all configuration options.
+Cake.Mug can be configured through several parameters. All configuration has to be done before the `Initialize` task is called. The basic conventions used by Cake.Mug are specified in [configuration.cake](Cake.Mug/Content/configuration.cake), e.g.:
+
+- Cake.Mug expects a directory structure such as `MyProject/Source/MyProject.sln`
+- Your `build.cake` file should be placed next to your `.sln` file
+- All build artifacts will be put in `MyProject/BuildArtifacts`
+- NuSpec files are searched for in the directories `MyProject/NuSpec/Chocolatey` and `MyProject/NuSpec/NuGet`
+- The default run configuration is `Release`
+- MSTest projects should contain the word "Tests" in their name
 
 ## Tasks
 
