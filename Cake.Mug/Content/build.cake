@@ -22,16 +22,6 @@ public static class BuildArtifactParameters
     public static DirectoryPath OutputDir { get; set; }
 }
 
-public static class SolutionProperties
-{
-    static SolutionProperties()
-    {
-        AssemblyInfos = new Dictionary<string, AssemblyInfoParseResult>();
-    }
-
-    public static Dictionary<string, AssemblyInfoParseResult> AssemblyInfos { get; private set; }
-}
-
 // A solution folder is a simple folder which can be used to organize projects in a solution
 private bool IsSolutionFolder(SolutionProject project)
 {
@@ -91,12 +81,6 @@ Task("Initialize")
     BuildArtifactParameters.ChocolateyDir = new DirectoryPath(BuildArtifactParameters.PackagesDir + "/Chocolatey");
     BuildArtifactParameters.NuGetDir = new DirectoryPath(BuildArtifactParameters.PackagesDir + "/NuGet");
     BuildArtifactParameters.OutputDir = new DirectoryPath(BuildParameters.ArtifactsDir + "/Output");
-
-    foreach (var assemblyInfo in GetFiles(BuildParameters.SolutionDir + "/**/AssemblyInfo.cs"))
-    {
-        var parsedAssemblyInfo = ParseAssemblyInfo(assemblyInfo);
-        SolutionProperties.AssemblyInfos.Add(parsedAssemblyInfo.Product, parsedAssemblyInfo);
-    }
 });
 
 Task("Info")
@@ -278,17 +262,7 @@ Task("CreateChocolateyPackages")
 
     foreach (var nuspec in chocolateySpecs)
     {
-        var settings = new ChocolateyPackSettings() { OutputDirectory = BuildArtifactParameters.ChocolateyDir };
-        AssemblyInfoParseResult assemblyInfo = null;
-
-        SolutionProperties.AssemblyInfos.TryGetValue(nuspec.GetFilenameWithoutExtension().ToString(), out assemblyInfo);
-
-        if (assemblyInfo != null)
-        {
-            settings.Version = assemblyInfo.AssemblyVersion;
-        }
-
-        ChocolateyPack(nuspec, settings);
+        ChocolateyPack(nuspec, new ChocolateyPackSettings() { OutputDirectory = BuildArtifactParameters.ChocolateyDir });
     }
 });
 
@@ -307,17 +281,7 @@ Task("CreateNuGetPackages")
 
     foreach (var nuspec in nuGetSpecs)
     {
-        var settings = new NuGetPackSettings() { OutputDirectory = BuildArtifactParameters.NuGetDir };
-        AssemblyInfoParseResult assemblyInfo = null;
-
-        SolutionProperties.AssemblyInfos.TryGetValue(nuspec.GetFilenameWithoutExtension().ToString(), out assemblyInfo);
-
-        if (assemblyInfo != null)
-        {
-            settings.Version = assemblyInfo.AssemblyVersion;
-        }
-
-        NuGetPack(nuspec, settings);
+        NuGetPack(nuspec, new NuGetPackSettings() { OutputDirectory = BuildArtifactParameters.NuGetDir });
     }
 });
 

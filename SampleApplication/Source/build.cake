@@ -18,8 +18,7 @@ Task("PublishClickOnce")
 {
     MSBuildSettings settings = new MSBuildSettings()
         .SetConfiguration(BuildParameters.Configuration)
-        .WithTarget("publish")
-        .WithProperty("ApplicationVersion", SolutionProperties.AssemblyInfos["SampleClickOnce"].AssemblyVersion + ".0");
+        .WithTarget("publish");
 
     MSBuild("SampleClickOnce/SampleClickOnce.csproj", settings);
 });
