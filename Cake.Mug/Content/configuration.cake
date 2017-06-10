@@ -1,3 +1,50 @@
+public static class PackageParameters
+{
+    static PackageParameters()
+    {
+        ChocolateySpecs = new FilePathCollection(PathComparer.Default);
+        NuGetSpecs = new FilePathCollection(PathComparer.Default);
+    }
+
+    /// <summary>
+    /// Gets or sets the source used for a Chocolatey push operation
+    /// </summary>
+    /// <value>An URL</value>
+    public static string ChocolateyPushSource { get; set; }
+
+    /// <summary>
+    /// Gets or sets the API key used for a Chocolatey push operation
+    /// </summary>
+    /// <value>An API key</value>
+    public static string ChocolateyPushApiKey { get; set; }
+
+    /// <summary>
+    /// Gets a collection of Chocolatey .nuspec files.
+    /// This property controls which packages are created.
+    /// </summary>
+    /// <value>A collection of .nuspec files</value>
+    public static FilePathCollection ChocolateySpecs { get; private set; }
+
+    /// <summary>
+    /// Gets or sets the source used for a NuGet push operation
+    /// </summary>
+    /// <value>An URL</value>
+    public static string NuGetPushSource { get; set; }
+
+    /// <summary>
+    /// Gets or sets the API key used for a NuGet push operation
+    /// </summary>
+    /// <value>An API key</value>
+    public static string NuGetPushApiKey { get; set; }
+
+    /// <summary>
+    /// Gets a collection of NuGet .nuspec files.
+    /// This property controls which packages are created.
+    /// </summary>
+    /// <value>A collection of .nuspec files</value>
+    public static FilePathCollection NuGetSpecs { get; private set; }
+}
+
 public static class BuildParameters
 {
     static BuildParameters()
@@ -12,8 +59,6 @@ public static class BuildParameters
         OpenCoverExcludeByFile = "*/*Designer.cs;*/*.g.cs;*/*.g.i.cs";
         DupFinderExcludePattern = new string[] {};
         DupFinderThrowExceptionIfDuplication = true;
-        ChocolateySpecs = "../NuSpec/Chocolatey/";
-        NuGetSpecs = "../NuSpec/NuGet/";
     }
 
     /// <summary>
@@ -75,16 +120,4 @@ public static class BuildParameters
     /// </summary>
     /// <value>If DupFinder should throw an Exception when duplicates are found</value>
     public static bool DupFinderThrowExceptionIfDuplication { get; set; }
-
-    /// <summary>
-    /// Gets or sets the specified Chocolatey NuSpec directory
-    /// </summary>
-    /// <value>A directory containg *.nuspec Chocolatey files</value>
-    public static DirectoryPath ChocolateySpecs { get; set; }
-
-    /// <summary>
-    /// Gets or sets the specified NuGet NuSpec directory
-    /// </summary>
-    /// <value>A directory containg *.nuspec NuGet files</value>
-    public static DirectoryPath NuGetSpecs { get; set; }
 }

@@ -59,8 +59,6 @@ Task("Initialize")
     }
 
     BuildParameters.ArtifactsDir = MakeAbsolute(BuildParameters.ArtifactsDir);
-    BuildParameters.ChocolateySpecs = MakeAbsolute(BuildParameters.ChocolateySpecs);
-    BuildParameters.NuGetSpecs = MakeAbsolute(BuildParameters.NuGetSpecs);
 
     // The TestResults directory is set relative to the current working directory as we cannot specify
     // an alternative tool path for MSTest (even though MSTestSettings offers a WorkingDirectory property)
@@ -92,8 +90,6 @@ Task("Info")
     Information("Solution: {0}", BuildParameters.Solution);
     Information("Treating warnings as errors: {0}", BuildParameters.DoTreatWarningsAsErrors);
     Information("Configuration: {0}", BuildParameters.Configuration);
-    Information("Chocolatey .nuspec directory: {0}", BuildParameters.ChocolateySpecs);
-    Information("NuGet .nuspec directory: {0}", BuildParameters.NuGetSpecs);
     Information("Artifacts are saved to: {0}", BuildParameters.ArtifactsDir);
 });
 
@@ -250,17 +246,12 @@ Task("Analyze")
 Task("CreateChocolateyPackages")
     .Description("Cake.Mug: Creates Chocolatey packages")
     .IsDependentOn("Build")
-    .WithCriteria(() => DirectoryExists(BuildParameters.ChocolateySpecs))
+    .WithCriteria(() => PackageParameters.ChocolateySpecs.Count > 0)
     .Does(() =>
 {
-    var chocolateySpecs = GetFiles(BuildParameters.ChocolateySpecs + "/**/*.nuspec");
+    EnsureDirectoryExists(BuildArtifactParameters.ChocolateyDir);
 
-    if (chocolateySpecs.Count > 0)
-    {
-        EnsureDirectoryExists(BuildArtifactParameters.ChocolateyDir);
-    }
-
-    foreach (var nuspec in chocolateySpecs)
+    foreach (var nuspec in PackageParameters.ChocolateySpecs)
     {
         ChocolateyPack(nuspec, new ChocolateyPackSettings() { OutputDirectory = BuildArtifactParameters.ChocolateyDir });
     }
@@ -269,26 +260,57 @@ Task("CreateChocolateyPackages")
 Task("CreateNuGetPackages")
     .Description("Cake.Mug: Creates NuGet packages")
     .IsDependentOn("Build")
-    .WithCriteria(() => DirectoryExists(BuildParameters.NuGetSpecs))
+    .WithCriteria(() => PackageParameters.NuGetSpecs.Count > 0)
     .Does(() =>
 {
-    var nuGetSpecs = GetFiles(BuildParameters.NuGetSpecs + "/**/*.nuspec");
+    EnsureDirectoryExists(BuildArtifactParameters.NuGetDir);
 
-    if (nuGetSpecs.Count > 0)
-    {
-        EnsureDirectoryExists(BuildArtifactParameters.NuGetDir);
-    }
-
-    foreach (var nuspec in nuGetSpecs)
+    foreach (var nuspec in PackageParameters.NuGetSpecs)
     {
         NuGetPack(nuspec, new NuGetPackSettings() { OutputDirectory = BuildArtifactParameters.NuGetDir });
     }
 });
 
 Task("CreatePackages")
-    .Description("Cake.Mug: A wrapper task for packaging tasks")
+    .Description("Cake.Mug: A wrapper for tasks that create packages")
     .IsDependentOn("CreateChocolateyPackages")
     .IsDependentOn("CreateNuGetPackages")
+    .Does(() =>
+{
+});
+
+Task("PushChocolateyPackages")
+    .Description("Cake.Mug: Pushes Chocolatey packages")
+    .IsDependentOn("CreateChocolateyPackages")
+    .WithCriteria(() => DirectoryExists(BuildArtifactParameters.ChocolateyDir))
+    .Does(() =>
+{
+    if (PackageParameters.ChocolateyPushSource == null) { throw new ArgumentNullException("PackageParameters.ChocolateyPushSource", "Please provide an URL"); }
+    if (PackageParameters.ChocolateyPushApiKey == null) { throw new ArgumentNullException("PackageParameters.ChocolateyPushApiKey", "Please provide an API key"); }
+
+    ChocolateyPush(GetFiles(BuildArtifactParameters.ChocolateyDir + "/**/*.nupkg"), new ChocolateyPushSettings() {
+        Source = PackageParameters.ChocolateyPushSource,
+        ApiKey = PackageParameters.ChocolateyPushApiKey });
+});
+
+Task("PushNuGetPackages")
+    .Description("Cake.Mug: Pushes NuGet packages")
+    .IsDependentOn("CreateNuGetPackages")
+    .WithCriteria(() => DirectoryExists(BuildArtifactParameters.NuGetDir))
+    .Does(() =>
+{
+    if (PackageParameters.NuGetPushSource == null) { throw new ArgumentNullException("PackageParameters.NuGetPushSource", "Please provide an URL"); }
+    if (PackageParameters.NuGetPushApiKey == null) { throw new ArgumentNullException("PackageParameters.NuGetPushApiKey", "Please provide an API key"); }
+
+    NuGetPush(GetFiles(BuildArtifactParameters.NuGetDir + "/**/*.nupkg"), new NuGetPushSettings() {
+        Source = PackageParameters.NuGetPushSource,
+        ApiKey = PackageParameters.NuGetPushApiKey });
+});
+
+Task("PushPackages")
+    .Description("Cake.Mug: A wrapper for tasks that push packages")
+    .IsDependentOn("PushChocolateyPackages")
+    .IsDependentOn("PushNuGetPackages")
     .Does(() =>
 {
 });

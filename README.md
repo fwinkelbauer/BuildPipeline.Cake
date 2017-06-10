@@ -16,10 +16,28 @@ var target = Argument("target", "Default");
 // Set the configuration option for Cake.Mug's build process
 BuildParameters.Configuration = Argument("configuration", "Release");
 
+// Set configuration for using Chocolatey pack and push operations (or delete if not need)
+PackageParameters.ChocolateySpecs.Add("PATH TO NUSPEC");
+PackageParameters.ChocolateyPushSource = "YOUR SOURCE HERE";
+PackageParameters.ChocolateyPushApiKey = "YOUR API KEY HERE";
+
+// Set configuration for using NuGet pack and push operations (or delete if not need)
+PackageParameters.NuGetSpecs.Add("PATH TO NUSPEC");
+PackageParameters.NuGetPushSource = "YOUR SOURCE HERE";
+PackageParameters.NuGetPushApiKey = "YOUR API KEY HERE";
+
 // Call the Cake.Mug tasks "Analyze" and "CreatePackages"
 Task("Default")
     .IsDependentOn("Analyze")
     .IsDependentOn("CreatePackages")
+    .Does(() =>
+{
+});
+
+// Call the Cake.Mug tasks "Analyze" and "PushPackages"
+Task("Publish")
+    .IsDependentOn("Analyze")
+    .IsDependentOn("PushPackages")
     .Does(() =>
 {
 });
@@ -41,7 +59,6 @@ Cake.Mug can be configured through several parameters. All configuration has to 
 - Cake.Mug expects a directory structure such as `MyProject/Source/MyProject.sln`
 - Your `build.cake` file should be placed next to your `.sln` file
 - All build artifacts will be put in `MyProject/BuildArtifacts`
-- NuSpec files are searched for in the directories `MyProject/NuSpec/Chocolatey` and `MyProject/NuSpec/NuGet`
 - The default run configuration is `Release`
 - MSTest projects should contain the word "Tests" in their name
 
@@ -127,7 +144,25 @@ Builds NuGet packages based on `.nuspec` files. All packages can be found in the
 
 **Depends on:** `CreateChocolateyPackages`, `CreateNuGetPackages`
 
-A wrapper task which can be used to run all packaging tasks.
+A wrapper task which can be used to run all create package tasks.
+
+### PushChocolateyPackages
+
+**Depends on:** `CreateChocolateyPackages`
+
+Pushes all created Chocolatey packages to a feed.
+
+### PushNuGetPackages
+
+**Depends on:** `CreateNuGetPackages`
+
+Pushes all created NuGet packages to a feed.
+
+### PushPackages
+
+**Depends on:** `PushChocolateyPackages`, `PushNuGetPackages`
+
+A wrapper task which can be used to run all push package tasks.
 
 ## License
 
