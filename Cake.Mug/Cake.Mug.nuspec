@@ -2,14 +2,16 @@
 <package >
   <metadata>
     <id>Cake.Mug</id>
-    <version>0.1.0</version>
+    <title>Cake.Mug</title>
+    <version>0.2.0</version>
     <authors>fwinkelbauer</authors>
     <owners>fwinkelbauer</owners>
     <licenseUrl>https://github.com/fwinkelbauer/Cake.Mug/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/fwinkelbauer/Cake.Mug</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>A custom Cake script to build C# projects.</description>
-    <copyright>Copyright 2017</copyright>
+    <summary>A custom Cake script to build C# projects.</summary>
+    <description>Cake.Mug is a configurable Cake script which can be used to build, analyze and pack (NuGet and Chocolatey) C# projects.</description>
+    <copyright>Copyright (c) 2017 Florian Winkelbauer</copyright>
     <tags>Build Cake</tags>
   </metadata>
 </package>

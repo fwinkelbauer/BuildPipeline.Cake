@@ -1,6 +1,8 @@
 # Cake.Mug
 
-This is a custom [Cake](http://cakebuild.net/) script to build C# projects.
+Cake.Mug is a configurable [Cake](http://cakebuild.net/) script which can be used to build, analyze and pack (NuGet and Chocolatey) C# projects.
+
+NuGet packages are provided [here](https://www.nuget.org/packages/Cake.Mug/) and [here](https://www.nuget.org/packages/Cake.Mug.Tools/).
 
 ## Usage
 
@@ -83,7 +85,7 @@ Prints relevant information such as the used solution (e.g. `ConsoleApplication1
 Performs three actions:
 
 - Cleans the build artifacts folder
-- Cleans the `TestResults` used by VSTest
+- Cleans the `TestResults` folder used by VSTest
 - Cleans the solution using MSBuild
 
 ### Restore
