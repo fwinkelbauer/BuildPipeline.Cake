@@ -1,9 +1,9 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <package >
   <metadata>
     <id>Cake.Mug</id>
     <title>Cake.Mug</title>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
     <authors>fwinkelbauer</authors>
     <owners>fwinkelbauer</owners>
     <licenseUrl>https://github.com/fwinkelbauer/Cake.Mug/blob/master/LICENSE</licenseUrl>
