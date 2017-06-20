@@ -4,7 +4,7 @@ Cake.Mug is a configurable [Cake](http://cakebuild.net/) script which can be use
 
 NuGet packages are provided [here](https://www.nuget.org/packages/Cake.Mug/) and [here](https://www.nuget.org/packages/Cake.Mug.Tools/).
 
-I am using [Bumpby](https://github.com/fwinkelbauer/Bumpy) to update all version information in my projects (AssemblyInfo.cs and .nuspec).
+I am using [Bumpy](https://github.com/fwinkelbauer/Bumpy) to update all version information in my projects (AssemblyInfo.cs and .nuspec).
 
 ## Usage
 
