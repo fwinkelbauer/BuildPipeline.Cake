@@ -10,7 +10,7 @@
     <projectUrl>https://github.com/fwinkelbauer/Cake.Mug</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>A set of tools used by Cake.Mug.</summary>
-    <description>This package lists all dependencies necessary to use Cake.Mug. Note that you do not need package if all tools are already provided in the PATH variable.</description>
+    <description>This package lists all dependencies necessary to use Cake.Mug. Note that you do not need this package if all tools are already provided in the PATH variable.</description>
     <copyright>Copyright (c) 2017 Florian Winkelbauer</copyright>
     <tags>Build Cake</tags>
   </metadata>
