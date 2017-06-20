@@ -102,11 +102,11 @@ Calls `nuget restore` using the solution file.
 
 Builds the solution using MSBuild and copies all output to the `BuildArtifacts` folder.
 
-### VSTest
+### MSTest
 
 **Depends on:** `Build`
 
-Runs VSTest and OpenCover on all projects which match a whitelist in the solution. All reports are put into the `BuildArtifacts` folder.
+Runs MSTest and OpenCover on all projects which match a whitelist in the solution. All reports are put into the `BuildArtifacts` folder.
 
 ### VSMetrics
 
