@@ -6,12 +6,7 @@ var target = Argument("target", "Default");
 BuildParameters.Configuration = Argument("configuration", "Release");
 
 PackageParameters.ChocolateySpecs.Add("../NuSpec/Chocolatey/SampleApplication.nuspec");
-PackageParameters.ChocolateyPushSource = "YOUR SOURCE HERE";
-PackageParameters.ChocolateyPushApiKey = "YOUR API KEY HERE";
-
 PackageParameters.NuGetSpecs.Add("../NuSpec/NuGet/SampleApplication.nuspec");
-PackageParameters.NuGetPushSource = "YOUR SOURCE HERE";
-PackageParameters.NuGetPushApiKey = "YOUR API KEY HERE";
 
 Task("Default")
     .IsDependentOn("Analyze")
