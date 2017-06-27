@@ -60,8 +60,6 @@ Run `.\build.ps1` in the `SampleApplication\Source` folder for an example. All o
 
 A list of all tools which are used by Cake.Mug can be found [here](Cake.Mug.Tools/Content/tools.cake). You can skip the load operation for the Cake.Mug.Tools package if all specified tools are reachable through the `PATH` environment variable. This can for example be achieved by installing all tools through [Chocolatey](http://chocolatey.org/).
 
-**Note:** You have to install the VSMetrics power tool (e.g. for [Visual Studio 2015](https://www.microsoft.com/en-us/download/details.aspx?id=48213)) in order to use the VSMetrics task. This task is included in the Analyze task, see below.
-
 ## Conventions / Configuration
 
 Cake.Mug can be configured through several parameters. All configuration has to be done before the `Initialize` task is called. The basic conventions used by Cake.Mug are specified in [configuration.cake](Cake.Mug/Content/configuration.cake), e.g.:
@@ -117,12 +115,6 @@ Builds the solution using MSBuild and copies all output to the `BuildArtifacts` 
 
 Runs MSTest and OpenCover on all projects which match a whitelist in the solution. All reports are put into the `BuildArtifacts` folder.
 
-### VSMetrics
-
-**Depends on:** `Build`
-
-Runs the Visual Studio powertool `metrics.exe` on all project output (`.exe` and `.dll` files) found in the solution. The report is put into the `BuildArtifacts` folder.
-
 ### DupFinder
 
 **Depends on:** `Info`
@@ -137,7 +129,7 @@ Runs the [ReSharper tool](https://www.jetbrains.com/resharper/features/command-l
 
 ### Analyze
 
-**Depends on:** `VSTest`, `VSMetrics`, `DupFinder`, `InspectCode`
+**Depends on:** `VSTest`, `DupFinder`, `InspectCode`
 
 A wrapper task which can be used to run all analytical tasks.
 

@@ -1,5 +1,4 @@
 #addin nuget:?package=Cake.ReSharperReports&version=0.6.0
-#addin nuget:?package=Cake.VsMetrics&version=0.2.0
 
 public static class BuildArtifactParameters
 {
@@ -8,8 +7,6 @@ public static class BuildArtifactParameters
     public static DirectoryPath OpenCoverDir { get; set; }
     public static FilePath OpenCoverXml { get; set; }
     public static DirectoryPath MSTestDir { get; set; }
-    public static DirectoryPath VsMetricsDir { get; set; }
-    public static FilePath VsMetricsXml { get; set; }
     public static DirectoryPath DupFinderDir { get; set; }
     public static FilePath DupFinderXml { get; set; }
     public static FilePath DupFinderHtml { get; set; }
@@ -68,8 +65,6 @@ Task("Initialize")
     BuildArtifactParameters.OpenCoverDir = new DirectoryPath(BuildArtifactParameters.AnalysisDir + "/OpenCover");
     BuildArtifactParameters.OpenCoverXml = new FilePath(BuildArtifactParameters.OpenCoverDir + "/openCover.xml");
     BuildArtifactParameters.MSTestDir = new DirectoryPath(BuildArtifactParameters.AnalysisDir + "/MSTest");
-    BuildArtifactParameters.VsMetricsDir = new DirectoryPath(BuildArtifactParameters.AnalysisDir + "/Metrics");
-    BuildArtifactParameters.VsMetricsXml = new FilePath(BuildArtifactParameters.VsMetricsDir + "/metrics.xml");
     BuildArtifactParameters.DupFinderDir = new DirectoryPath(BuildArtifactParameters.AnalysisDir + "/DupFinder");
     BuildArtifactParameters.DupFinderXml = new FilePath(BuildArtifactParameters.DupFinderDir + "/dupFinder.xml");
     BuildArtifactParameters.DupFinderHtml = new FilePath(BuildArtifactParameters.DupFinderDir + "/dupFinder.html");
@@ -172,35 +167,6 @@ Task("MSTest")
     ReportUnit(BuildArtifactParameters.MSTestResultsDir, BuildArtifactParameters.MSTestDir, new ReportUnitSettings());
 });
 
-Task("VSMetrics")
-    .Description("Cake.Mug: Calculates code metrics of the solution using metrics.exe")
-    .IsDependentOn("Build")
-    .Does(() =>
-{
-    EnsureDirectoryExists(BuildArtifactParameters.VsMetricsDir);
-
-    var projectOutputs = new FilePathCollection(new PathComparer(false));
-
-    foreach (var project in ParseSolution(BuildParameters.Solution).Projects)
-    {
-        if (IsSolutionFolder(project))
-        {
-            continue;
-        }
-
-        if (project.Path.FullPath.ToLower().Contains("wixproj"))
-        {
-            Warning("Skipping WiX project");
-            continue;
-        }
-
-        projectOutputs.Add(GetFiles(BuildArtifactParameters.OutputDir + "/" + project.Name + "/" + project.Name + ".exe"));
-        projectOutputs.Add(GetFiles(BuildArtifactParameters.OutputDir + "/" + project.Name + "/" + project.Name + ".dll"));
-    }
-
-    VsMetrics(projectOutputs, BuildArtifactParameters.VsMetricsXml, new VsMetricsSettings() { IgnoreGeneratedCode = true, SearchGac = true });
-});
-
 Task("DupFinder")
     .Description("Cake.Mug: Analyses the solution using dupfinder.exe")
     .IsDependentOn("Info")
@@ -240,7 +206,6 @@ Task("InspectCode")
 Task("Analyze")
     .Description("Cake.Mug: A wrapper task for all analytical tasks")
     .IsDependentOn("MSTest")
-    .IsDependentOn("VSMetrics")
     .IsDependentOn("DupFinder")
     .IsDependentOn("InspectCode")
     .Does(() =>
