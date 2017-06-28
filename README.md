@@ -20,11 +20,11 @@ var target = Argument("target", "Default");
 // Set the configuration option for Cake.Mug's build process
 BuildParameters.Configuration = Argument("configuration", "Release");
 
-// Set configuration for using Chocolatey pack and push operations (or delete if not need)
+// Set configuration for using Chocolatey pack and push operations (or delete if not needed)
 PackageParameters.ChocolateySpecs.Add("PATH TO NUSPEC");
 PackageParameters.ChocolateyPushSource = "YOUR SOURCE (FEED URL) HERE";
 
-// Set configuration for using NuGet pack and push operations (or delete if not need)
+// Set configuration for using NuGet pack and push operations (or delete if not needed)
 PackageParameters.NuGetSpecs.Add("PATH TO NUSPEC");
 PackageParameters.NuGetPushSource = "YOUR SOURCE (FEED URL) HERE";
 
