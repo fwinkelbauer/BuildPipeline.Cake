@@ -13,12 +13,6 @@ public static class PackageParameters
     public static string ChocolateyPushSource { get; set; }
 
     /// <summary>
-    /// Gets or sets the API key used for a Chocolatey push operation
-    /// </summary>
-    /// <value>An API key</value>
-    public static string ChocolateyPushApiKey { get; set; }
-
-    /// <summary>
     /// Gets a collection of Chocolatey .nuspec files.
     /// This property controls which packages are created.
     /// </summary>
@@ -30,12 +24,6 @@ public static class PackageParameters
     /// </summary>
     /// <value>An URL</value>
     public static string NuGetPushSource { get; set; }
-
-    /// <summary>
-    /// Gets or sets the API key used for a NuGet push operation
-    /// </summary>
-    /// <value>An API key</value>
-    public static string NuGetPushApiKey { get; set; }
 
     /// <summary>
     /// Gets a collection of NuGet .nuspec files.

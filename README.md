@@ -23,16 +23,10 @@ BuildParameters.Configuration = Argument("configuration", "Release");
 // Set configuration for using Chocolatey pack and push operations (or delete if not need)
 PackageParameters.ChocolateySpecs.Add("PATH TO NUSPEC");
 PackageParameters.ChocolateyPushSource = "YOUR SOURCE (FEED URL) HERE";
-// Because of potential security issues I recommend that you pass
-// an API key using the Argument(...) method of Cake instead of hard coding a value here
-PackageParameters.ChocolateyPushApiKey = "YOUR API KEY HERE";
 
 // Set configuration for using NuGet pack and push operations (or delete if not need)
 PackageParameters.NuGetSpecs.Add("PATH TO NUSPEC");
 PackageParameters.NuGetPushSource = "YOUR SOURCE (FEED URL) HERE";
-// Because of potential security issues I recommend that you pass
-// an API key using the Argument(...) method of Cake instead of hard coding a value here
-PackageParameters.NuGetPushApiKey = "YOUR API KEY HERE";
 
 // Call the Cake.Mug tasks "Analyze" and "CreatePackages"
 Task("Default")

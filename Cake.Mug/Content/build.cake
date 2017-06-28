@@ -255,11 +255,9 @@ Task("PushChocolateyPackages")
     .Does(() =>
 {
     if (PackageParameters.ChocolateyPushSource == null) { throw new ArgumentNullException("PackageParameters.ChocolateyPushSource", "Please provide an URL"); }
-    if (PackageParameters.ChocolateyPushApiKey == null) { throw new ArgumentNullException("PackageParameters.ChocolateyPushApiKey", "Please provide an API key"); }
 
     ChocolateyPush(GetFiles(BuildArtifactParameters.ChocolateyDir + "/**/*.nupkg"), new ChocolateyPushSettings() {
-        Source = PackageParameters.ChocolateyPushSource,
-        ApiKey = PackageParameters.ChocolateyPushApiKey });
+        Source = PackageParameters.ChocolateyPushSource });
 });
 
 Task("PushNuGetPackages")
@@ -269,11 +267,9 @@ Task("PushNuGetPackages")
     .Does(() =>
 {
     if (PackageParameters.NuGetPushSource == null) { throw new ArgumentNullException("PackageParameters.NuGetPushSource", "Please provide an URL"); }
-    if (PackageParameters.NuGetPushApiKey == null) { throw new ArgumentNullException("PackageParameters.NuGetPushApiKey", "Please provide an API key"); }
 
     NuGetPush(GetFiles(BuildArtifactParameters.NuGetDir + "/**/*.nupkg"), new NuGetPushSettings() {
-        Source = PackageParameters.NuGetPushSource,
-        ApiKey = PackageParameters.NuGetPushApiKey });
+        Source = PackageParameters.NuGetPushSource });
 });
 
 Task("PushPackages")
