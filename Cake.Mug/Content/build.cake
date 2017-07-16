@@ -141,6 +141,8 @@ Task("Build")
 
         EnsureDirectoryExists(destinationDir);
         CopyFiles(outputPath, destinationDir, true);
+        DeleteFiles(destinationDir + "/*.CodeAnalysisLog.xml");
+        DeleteFiles(destinationDir + "/*.lastcodeanalysissucceeded");
     }
 });
 
