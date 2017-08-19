@@ -1,2 +1,3 @@
 Cake.Mug\*.nuspec = <version>(?<version>\d+(\.\d+)+)
 Cake.Mug.Tools\*.nuspec = <version>(?<version>\d+(\.\d+)+)
+build.cake = "(?<version>\d+\.\d+\.\d+)"
