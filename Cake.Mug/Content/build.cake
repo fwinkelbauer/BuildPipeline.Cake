@@ -17,7 +17,6 @@ public static class BuildArtifactParameters
     public static DirectoryPath ChocolateyDir { get; set; }
     public static DirectoryPath NuGetDir { get; set; }
     public static DirectoryPath OutputDir { get; set; }
-    public static FilePathCollection MSTestFiles { get; set; }
 }
 
 // A solution folder is a simple folder which can be used to organize projects in a solution
@@ -75,8 +74,6 @@ Task("Initialize")
     BuildArtifactParameters.ChocolateyDir = new DirectoryPath(BuildArtifactParameters.PackagesDir + "/Chocolatey");
     BuildArtifactParameters.NuGetDir = new DirectoryPath(BuildArtifactParameters.PackagesDir + "/NuGet");
     BuildArtifactParameters.OutputDir = new DirectoryPath(BuildParameters.ArtifactsDir + "/Output");
-
-    BuildArtifactParameters.MSTestFiles = GetFiles(BuildArtifactParameters.OutputDir + "/**/" + BuildParameters.TestDllWhitelist);
 });
 
 Task("Info")
@@ -149,14 +146,20 @@ Task("Build")
 Task("MSTest")
     .Description("Cake.Mug: Runs MSTest and OpenCover")
     .IsDependentOn("Build")
-    .WithCriteria(() => BuildArtifactParameters.MSTestFiles.Count > 0)
     .Does(() =>
 {
+    var testFiles = GetFiles(BuildArtifactParameters.OutputDir + "/**/" + BuildParameters.TestDllWhitelist);
+
+    if (testFiles.Count == 0)
+    {
+        return;
+    }
+
     EnsureDirectoryExists(BuildArtifactParameters.OpenCoverDir);
     EnsureDirectoryExists(BuildArtifactParameters.MSTestDir);
 
     OpenCover(
-        tool => { tool.MSTest(BuildArtifactParameters.MSTestFiles); },
+        tool => { tool.MSTest(testFiles); },
         BuildArtifactParameters.OpenCoverXml,
         new OpenCoverSettings() { ReturnTargetCodeOffset = 0 }
             .WithFilter(BuildParameters.OpenCoverFilter)
