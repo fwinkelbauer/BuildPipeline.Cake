@@ -27,6 +27,8 @@ Task("CreatePackages")
 {
     NuGetPack("Cake.Mug/Cake.Mug.nuspec", new NuGetPackSettings() { OutputDirectory = artifactsDir });
     NuGetPack("Cake.Mug.Tools/Cake.Mug.Tools.nuspec", new NuGetPackSettings() { OutputDirectory = artifactsDir });
+
+    ChocolateyPack("Cake.Mug.ChocoTools/Cake.Mug.ChocoTools.nuspec", new ChocolateyPackSettings() { OutputDirectory = artifactsDir });
 });
 
 Task("PushPackages")

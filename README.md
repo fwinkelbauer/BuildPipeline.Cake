@@ -1,6 +1,6 @@
 # Cake.Mug
 
-Cake.Mug is a configurable [Cake](http://cakebuild.net/) script which can be used to build, analyze and pack (NuGet and Chocolatey) C# projects.
+Cake.Mug is a configurable [Cake](http://cakebuild.net/) script which can be used to build, analyze and pack (NuGet and Chocolatey) .NET framework projects.
 
 NuGet packages are provided [here](https://www.nuget.org/packages/Cake.Mug/) and [here](https://www.nuget.org/packages/Cake.Mug.Tools/).
 
