@@ -28,6 +28,7 @@
   </metadata>
   <files>
     <file src="chocolateyInstall.ps1" target="tools"/>
+    <file src="chocolateyUninstall.ps1" target="tools"/>
     <file src="build.ps1" target="tools"/>
   </files>
 </package>
