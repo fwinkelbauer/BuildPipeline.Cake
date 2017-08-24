@@ -4,7 +4,7 @@ var user = EnvironmentVariable("GITHUB_USERNAME");
 var password = EnvironmentVariable("GITHUB_PASSWORD");
 var owner = "fwinkelbauer";
 var repository = "Cake.Mug";
-var milestone = "0.6.0";
+var milestone = "0.7.0";
 
 var target = Argument("target", "Default");
 var artifactsDir = new DirectoryPath("BuildArtifacts");
