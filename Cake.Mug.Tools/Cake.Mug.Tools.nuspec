@@ -7,8 +7,9 @@
     <authors>fwinkelbauer</authors>
     <owners>fwinkelbauer</owners>
     <iconUrl>https://raw.githubusercontent.com/cake-contrib/graphics/master/png/cake-contrib-small.png</iconUrl>
-    <licenseUrl>https://github.com/fwinkelbauer/Cake.Mug/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/fwinkelbauer/Cake.Mug</projectUrl>
+    <licenseUrl>https://github.com/fwinkelbauer/Cake.Mug/blob/master/LICENSE</licenseUrl>
+    <releaseNotes>https://github.com/fwinkelbauer/Cake.Mug/blob/master/CHANGELOG.md</releaseNotes>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>A set of tools used by Cake.Mug.</summary>
     <description>This package lists all dependencies necessary to use Cake.Mug. Note that you do not need this package if all tools are already provided in the PATH variable.</description>

@@ -9,7 +9,7 @@
     <projectUrl>https://github.com/fwinkelbauer/Cake.Mug</projectUrl>
     <projectSourceUrl>https://github.com/fwinkelbauer/Cake.Mug</projectSourceUrl>
     <packageSourceUrl>https://github.com/fwinkelbauer/Cake.Mug</packageSourceUrl>
-    <releaseNotes>https://github.com/fwinkelbauer/Cake.Mug/releases</releaseNotes>
+    <releaseNotes>https://github.com/fwinkelbauer/Cake.Mug/blob/master/CHANGELOG.md</releaseNotes>
     <bugTrackerUrl>https://github.com/fwinkelbauer/Cake.Mug/issues</bugTrackerUrl>
     <licenseUrl>https://github.com/fwinkelbauer/Cake.Mug/blob/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>

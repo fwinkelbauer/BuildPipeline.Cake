@@ -7,8 +7,9 @@
     <authors>fwinkelbauer</authors>
     <owners>fwinkelbauer</owners>
     <iconUrl>https://raw.githubusercontent.com/cake-contrib/graphics/master/png/cake-contrib-small.png</iconUrl>
-    <licenseUrl>https://github.com/fwinkelbauer/Cake.Mug/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/fwinkelbauer/Cake.Mug</projectUrl>
+    <licenseUrl>https://github.com/fwinkelbauer/Cake.Mug/blob/master/LICENSE</licenseUrl>
+    <releaseNotes>https://github.com/fwinkelbauer/Cake.Mug/blob/master/CHANGELOG.md</releaseNotes>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>A custom Cake script to build C# projects.</summary>
     <description>Cake.Mug is a configurable Cake script which can be used to build, analyze and pack (NuGet and Chocolatey) C# projects.</description>

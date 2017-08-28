@@ -1,26 +1,26 @@
-## 0.7.0 (2017-08-24)
+# Changelog
 
+All notable changes to this project will be documented in this file.
 
-As part of this release we had [4 commits](https://github.com/fwinkelbauer/Cake.Mug/compare/0.6.0...0.7.0) which resulted in [1 issue](https://github.com/fwinkelbauer/Cake.Mug/issues?milestone=2&state=closed) being closed.
+The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
 
-__Improvement__
+- Removed GitReleaseManager from the build script
+- Adopted keepachangelog.com
 
-- [__#10__](https://github.com/fwinkelbauer/Cake.Mug/issues/10) Make MSTest task skipable
+## [0.7.0] - 2017-08-24
 
+### Added
 
-## 0.6.0 (2017-08-21)
+- [#10](https://github.com/fwinkelbauer/Cake.Mug/issues/10) Make MSTest task skipable
 
+## [0.6.0] - 2017-08-21
 
-As part of this release we had [2 issues](https://github.com/fwinkelbauer/Cake.Mug/issues?milestone=1&state=closed) closed.
+### Fixed
 
+- [#9](https://github.com/fwinkelbauer/Cake.Mug/issues/9) Fix bug in MSTest task
 
-__Bug__
+### Added
 
-- [__#9__](https://github.com/fwinkelbauer/Cake.Mug/issues/9) Fix bug in MSTest task
-
-__Improvement__
-
-- [__#5__](https://github.com/fwinkelbauer/Cake.Mug/issues/5) Use Cake to build Cake.Mug
-
-
+- [#5](https://github.com/fwinkelbauer/Cake.Mug/issues/5) Use Cake to build Cake.Mug
