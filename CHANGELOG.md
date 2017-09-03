@@ -6,8 +6,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 ## [Unreleased]
 
-- Removed GitReleaseManager from the build script
+## [0.8.0] - 2017-09-03
+
+### Changed
+
 - Adopted keepachangelog.com
+- The push tasks are now skipped if no push source URL is provided
+
+### Removed
+
+- Removed GitReleaseManager from the build script
 
 ## [0.7.0] - 2017-08-24
 

@@ -253,7 +253,7 @@ Task("CreatePackages")
 Task("PushChocolateyPackages")
     .Description("Cake.Mug: Pushes Chocolatey packages")
     .IsDependentOn("CreateChocolateyPackages")
-    .WithCriteria(() => DirectoryExists(BuildArtifactParameters.ChocolateyDir))
+    .WithCriteria(() => DirectoryExists(BuildArtifactParameters.ChocolateyDir) && !string.IsNullOrEmpty(PackageParameters.ChocolateyPushSource))
     .Does(() =>
 {
     if (PackageParameters.ChocolateyPushSource == null) { throw new ArgumentNullException("PackageParameters.ChocolateyPushSource", "Please provide an URL"); }
@@ -265,7 +265,7 @@ Task("PushChocolateyPackages")
 Task("PushNuGetPackages")
     .Description("Cake.Mug: Pushes NuGet packages")
     .IsDependentOn("CreateNuGetPackages")
-    .WithCriteria(() => DirectoryExists(BuildArtifactParameters.NuGetDir))
+    .WithCriteria(() => DirectoryExists(BuildArtifactParameters.NuGetDir) && !string.IsNullOrEmpty(PackageParameters.NuGetPushSource))
     .Does(() =>
 {
     if (PackageParameters.NuGetPushSource == null) { throw new ArgumentNullException("PackageParameters.NuGetPushSource", "Please provide an URL"); }
