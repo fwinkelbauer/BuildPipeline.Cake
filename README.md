@@ -1,5 +1,7 @@
 # Cake.Mug
 
+**Deprecated:** I have stopped developing this package. Have a look at [Cake.Recipe](https://github.com/cake-contrib/Cake.Recipe) for a terrific alternative with a ton more features!
+
 Cake.Mug is a configurable [Cake](http://cakebuild.net/) script which can be used to build, analyze and pack (NuGet and Chocolatey) .NET framework projects.
 
 NuGet packages are provided [here](https://www.nuget.org/packages/Cake.Mug/) and [here](https://www.nuget.org/packages/Cake.Mug.Tools/).
